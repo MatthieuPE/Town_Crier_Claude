@@ -1,0 +1,26 @@
+# Theme definition: read by the daily fetch (databases) and by the run (keywords).
+# Research articles of six general-science journals, fetched from OpenAlex.
+# Needs the OPENALEX_API_KEY secret in the GitHub repository.
+name: science-at-large
+title: Science at large
+description: >-
+  Major research results of the period in any scientific field, published in
+  leading general-science journals.
+databases:
+  openalex:
+    journals:
+      - {name: Nature, issn: [0028-0836, 1476-4687]}
+      - {name: Science, issn: [0036-8075, 1095-9203]}
+      - {name: Cell, issn: [0092-8674, 1097-4172]}
+      - {name: PNAS, issn: [0027-8424, 1091-6490]}
+      - {name: Physical Review Letters, issn: [0031-9007, 1079-7114]}
+      - {name: The New England Journal of Medicine, issn: [0028-4793, 1533-4406]}
+keywords:
+  any: []
+  all: []
+  exclude: []
+authors: []
+examples: []
+skills:
+  extract: null
+  summarize: {1: null, 2: null, 3: null}

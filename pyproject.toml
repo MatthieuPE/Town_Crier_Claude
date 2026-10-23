@@ -1,0 +1,32 @@
+[project]
+name = "town-crier-claude"
+version = "0.1.0"
+description = "Configurable literature digest for Claude: daily paper fetch and digest run tools."
+requires-python = ">=3.10"
+dependencies = ["pyyaml>=6.0"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers"
+testpaths = ["tests"]
+markers = [
+    "fetch: daily fetch package (GitHub Action)",
+    "run: digest run tools (Claude side)",
+    "arxiv: arXiv client",
+    "biorxiv: bioRxiv/medRxiv client",
+    "openalex: OpenAlex client",
+    "store: data folder storage",
+    "themes: theme definitions",
+    "period: covered period",
+    "config: configuration",
+    "prefilter: keyword filter",
+    "candidates: candidate pools",
+    "selection: judgments and selection",
+    "fulltext: full-text section cut",
+    "assemble: digest assembly",
+    "checks: accuracy and format checks",
+    "unit: fast isolated tests",
+    "integration: multi-component tests",
+]
