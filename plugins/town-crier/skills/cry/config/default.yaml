@@ -1,0 +1,94 @@
+# Town Crier — default configuration
+#
+# Copy this file, edit it, and give it to Claude with your request,
+# or let the `configure` skill write it with you.
+# Values in <angle brackets> must be filled in before a run.
+# Field reference: schema.md (same folder).
+
+version: 1
+
+# Covered period. Default: the last week.
+period:
+  length: 1            # number of units covered
+  unit: week           # day | week | month
+  end: today           # last day covered: "today" or YYYY-MM-DD
+
+output:
+  title: "The Town Crier"
+  language: English
+  filename: "town-crier_{start}_{end}.md"
+  delivery: file       # TODO: file | artifact
+
+# Used only by the `schedule-cry` skill.
+schedule:
+  weekday: monday      # when period.unit is week
+  day_of_month: 1      # when period.unit is month
+  time: "08:00"        # local time
+  timezone: null       # IANA name, e.g. Europe/Paris. Asked when null.
+
+# Per-category defaults. Any subsection can override them.
+defaults:
+  count_method: on_theme   # on_theme | categories (see schema.md)
+  category_1:
+    n_papers: 3
+    rank_by: relevance     # relevance (fit to the theme) | impact
+    count: true            # show the number of papers released in the period
+  category_2:
+    n_papers: 1
+    rank_by: impact
+    count: true
+  category_3:
+    n_papers: 3
+    rank_by: impact
+    count: false
+
+# Output structure: sections > subsections.
+# Each subsection has one theme and one summary category (1, 2 or 3).
+sections:
+
+  # Section 1 — your main theme.
+  - title: "<MAIN THEME>"
+    subsections:
+      - theme: "<SPECIFIC RESEARCH TOPIC>"
+        description: "<one or two sentences: what counts as relevant>"
+        keywords: []
+        sources:
+          arxiv: []          # e.g. [astro-ph.GA]
+        category: 1
+        skills:
+          extract: null      # optional theme skill, e.g. extract-paper-<theme>
+          summarize: null    # optional theme skill, e.g. summarize-category-1-<theme>
+      - theme: "<SUB-DOMAIN OF YOUR FIELD>"
+        description: "<one or two sentences>"
+        keywords: []
+        sources:
+          arxiv: []
+        category: 2
+        skills:
+          extract: null
+          summarize: null
+
+  # Section 2 — close fields, not directly related to yours.
+  - title: "Next door"
+    subsections:
+      - theme: "<CLOSE FIELD 1>"
+        sources:
+          arxiv: []
+        category: 2
+      - theme: "<CLOSE FIELD 2>"
+        sources:
+          arxiv: []
+        category: 2
+      - theme: "<CLOSE FIELD 3>"
+        sources:
+          arxiv: []
+        category: 2
+
+  # Section 3 — main scientific news of the period, any field.
+  - title: "Science at large"
+    subsections:
+      - theme: "Major scientific results in any field"
+        sources:
+          journals: [Nature, Science, Cell, PNAS, Physical Review Letters, The New England Journal of Medicine]
+          news: [Nature News, Science news, Quanta Magazine]
+        category: 3
