@@ -1,9 +1,16 @@
 # Town Crier
 
 A configurable literature digest for researchers, over a tunable period (one week by default).
-It looks for the papers of the period, selects them by fit to your themes or by impact, summarizes them at three depth levels, and assembles them into the sections you configured.
+A daily GitHub Action collects new papers. Each digest run selects them by fit to your themes
+or by impact, summarizes them at three depth levels, checks every number against the papers,
+and assembles them into the sections you configured.
 
-Start with the `cry` skill: ask Claude *"Run the Town Crier"*.
-Set up your themes with the `configure` skill and deploy a scheduled task with `schedule-cry`.
+Install in Claude Code: `/plugin install town-crier --marketplace MatthieuPE/Town_Crier_Claude`.
+In claude.ai: add the marketplace `https://github.com/MatthieuPE/Town_Crier_Claude` under
+Customize → Plugins, then install **town-crier**.
 
-Full documentation: the repository [README](../../README.md).
+- Run it: ask Claude *"Run the Town Crier with configs/<name>.yaml"* (`cry` skill).
+- Set it up: *"Set up my Town Crier"* (`configure`), *"Define a theme"* (`define-theme`).
+- Automate it: *"Schedule my Town Crier"* (`schedule-cry`).
+
+Documentation: the repository [README](../../README.md) and [setup guide](../../docs/setup.md).

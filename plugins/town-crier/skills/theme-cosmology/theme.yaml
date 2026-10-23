@@ -1,0 +1,18 @@
+# Theme definition: read by the daily fetch (databases) and by the run (keywords).
+# No keywords: every astro-ph.CO paper is a candidate; Claude judges impact.
+name: cosmology
+title: Cosmology and dark matter
+description: >-
+  Cosmological models and parameters, large-scale structure, the cosmic
+  microwave background, dark matter and dark energy.
+databases:
+  arxiv: [astro-ph.CO]
+keywords:
+  any: []
+  all: []
+  exclude: []
+authors: []
+examples: []
+skills:
+  extract: extract-paper-cosmology
+  summarize: {1: null, 2: summarize-category-2-cosmology, 3: null}
