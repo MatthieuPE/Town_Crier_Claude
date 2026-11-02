@@ -120,7 +120,7 @@ def cmd_load(args):
     files.write_json(run_dir / "pools.json", pools)
     for note in notes:
         add_note(run_dir, note)
-    limit = int((resolved.get("selection") or {}).get("title_screen_above", 120))
+    limit = int((resolved.get("selection") or {}).get("title_screen_above", 40))
     _print(f"{len(records)} papers in the period; {len(cands)} candidates")
     for sub in config_mod.iter_subsections(resolved):
         n = len(pools[sub["id"]])

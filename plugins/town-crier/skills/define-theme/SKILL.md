@@ -26,6 +26,8 @@ Templates: `templates/theme.yaml` and `templates/theme-SKILL.md.txt` in this fol
      categories (then stage 2 does all the filtering).
    - `all`: papers must match every one. Rarely needed.
    - `exclude`: papers matching one are dropped. Use for known false positives.
+   - `exclude_titles`: whole titles to drop, e.g. a journal's weekly digest page; a trailing
+     `*` drops titles that start with it. Safer than `exclude` for recurring non-papers.
    - Matching is on title and abstract, whole words, case-insensitive; `*` at the end
      matches any ending (`stream*`); hyphens count as spaces (`GD-1` matches `GD 1`).
    - `authors`: names or collaborations whose papers are always kept.

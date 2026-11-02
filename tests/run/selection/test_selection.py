@@ -79,3 +79,21 @@ def test_category_3_fields():
     records = {p: {"paper_id": p} for p in "abcd"}
     sel = selection.finalize(resolved, {"1.1": list("abcd")}, judged, records)
     assert [j["paper_id"] for j in sel["subsections"]["1.1"]["summaries"]] == ["b", "d"]
+
+
+@pytest.mark.run
+@pytest.mark.selection
+@pytest.mark.unit
+def test_category_3_summarizes_research_only():
+    """Kinds other than research are never summarized in category 3; category 2 keeps 'other'."""
+    J = selection.Judgment
+    resolved = {"period": {}, "sections": [{"id": "1", "subsections": [
+        sub("1.1", 3, 2, one_per_field=True, exclude_fields=[]), sub("1.2", 2, 1)]}]}
+    judged = {"1.1": [J("o", True, 3, kind="other", field="Biology"),
+                      J("v", True, 3, kind="review", field="Physics"),
+                      J("r", True, 2, kind="research", field="Chemistry & materials")],
+              "1.2": [J("d", True, 3, kind="other")]}
+    records = {p: {"paper_id": p} for p in "ovrd"}
+    sel = selection.finalize(resolved, {"1.1": list("ovr"), "1.2": ["d"]}, judged, records)
+    assert [j["paper_id"] for j in sel["subsections"]["1.1"]["summaries"]] == ["r"]
+    assert [j["paper_id"] for j in sel["subsections"]["1.2"]["summaries"]] == ["d"]

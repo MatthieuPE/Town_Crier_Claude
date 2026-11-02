@@ -42,9 +42,14 @@ def load_summaries(run_dir):
 
 
 def link_title(rec):
-    """Title safe inside Markdown link text."""
+    """Title safe inside Markdown link text: no brackets, no HTML tags.
+
+    Math in titles such as ``<B>`` or ``0.4<z<4`` would otherwise be read
+    as HTML by Markdown viewers.
+    """
     title = " ".join((rec.get("title") or "Untitled").split())
-    return title.replace("[", "(").replace("]", ")")
+    title = title.replace("[", "(").replace("]", ")")              # keep link syntax intact
+    return title.replace("<", "&lt;").replace(">", "&gt;")          # shown as < and >
 
 
 def entry_header(rec, judgment, category, news, labels):

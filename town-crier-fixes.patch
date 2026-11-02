@@ -1,0 +1,479 @@
+diff --git a/.DS_Store b/.DS_Store
+deleted file mode 100644
+index c8b688026cb84a7a4e3b6b7810d3ff4b48f3f846..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 6148
+zcmeHK%}T>S5Z>*NO({YS3Oz1(Ef}>5;w8lT0!H+pQWFw17_+5G?V%KM))(?gd>&_Z
+zH_&46C}L+|_nV!c-OLBsAI2E>X3+s-He<|!hR9K=5j5Aj8YUQ#t2y#;o=?J5hBedt
+zO%r~5n-wf(IrOXF{}E2oBrhE2lQ){J_EyL0SUv0Bf0A>*2#Q(m1=Cv`T}hdSl^%rG
+zNjx9hJLfVhf+UNlDj|tt2)VmSvPjN7Im@D4<@(xTb*=8$?k^TYXE+eYj<Xzy#p$6l
+z5W}OB<+5w-?(Lslj-S()OulI%IWVqd+h7InpsZB%>QA#&W{+U4GO9>IVt^PR28e;p
+zWWbyUR&O)Qr>cnoV&De`aDNcc5M6_%MzwW7hu3HHw-8Z4$F~HcFz6aAHG&6(>r_CU
+z%FPpl>vXUS6XzN%HR^Q6)ygoBS-E<=aJ4$vg$iff)kr-tKn$!i(9}a4&;JYfWojS!
+z>nSuM28e-w#sF`P{E-JmnX~m<d3e?eXb;d(Fs?)e1oX8_01R*+=_{x93)CUbHCSrI
+US<tT10qG*32%(M`_yq>O06F7J761SM
+
+diff --git a/.gitignore b/.gitignore
+index d262d20..509dab9 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,3 +3,4 @@ __pycache__/
+ .pytest_cache/
+ town-crier-runs/
+ _data/
++.DS_Store
+diff --git a/docs/extending.md b/docs/extending.md
+index 090a524..5677ddb 100644
+--- a/docs/extending.md
++++ b/docs/extending.md
+@@ -21,7 +21,8 @@ Keyword syntax (title and abstract, case-insensitive):
+ | `GD-1` | `GD-1`, `GD 1` (hyphens and slashes count as spaces) |
+ 
+ `any`: at least one must match (empty: keep every paper of the categories). `all`: every
+-one must match. `exclude`: none may match. `authors`: always kept.
++one must match. `exclude`: none may match. `exclude_titles`: whole titles to drop (a
++trailing `*` drops titles that start with it). `authors`: always kept.
+ 
+ ## 2. Theme skills (extracting and summarizing)
+ A theme skill specializes a base skill for one theme, e.g. cosmology. It adds rules; the
+diff --git a/plugins/town-crier/.claude-plugin/plugin.json b/plugins/town-crier/.claude-plugin/plugin.json
+index 940497c..b546f57 100644
+--- a/plugins/town-crier/.claude-plugin/plugin.json
++++ b/plugins/town-crier/.claude-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "town-crier",
+-  "version": "0.1.0",
++  "version": "0.1.1",
+   "description": "Configurable literature digest over a tunable period: new papers fetched daily, selected by fit or impact, summarized at three depth levels with accuracy checks, and assembled into your sections. Designed to run as a scheduled task.",
+   "author": {
+     "name": "Matthieu Pélissier"
+diff --git a/plugins/town-crier/skills/cry/config/default.yaml b/plugins/town-crier/skills/cry/config/default.yaml
+index 5767bf2..068abb9 100644
+--- a/plugins/town-crier/skills/cry/config/default.yaml
++++ b/plugins/town-crier/skills/cry/config/default.yaml
+@@ -37,7 +37,7 @@ schedule:
+ 
+ # Review of candidates.
+ selection:
+-  title_screen_above: 120   # bigger pools are screened on titles first
++  title_screen_above: 40    # bigger pools are screened on titles first (saves tokens)
+ 
+ # Full text, read for category 1 papers only.
+ full_text:
+diff --git a/plugins/town-crier/skills/cry/config/schema.md b/plugins/town-crier/skills/cry/config/schema.md
+index 6f46506..da5ae13 100644
+--- a/plugins/town-crier/skills/cry/config/schema.md
++++ b/plugins/town-crier/skills/cry/config/schema.md
+@@ -40,7 +40,7 @@ Check a configuration with `tc.py resolve --config <file> --dry-run`.
+ ## `selection`
+ | Field | Default | Meaning |
+ |---|---|---|
+-| `title_screen_above` | `120` | Pools larger than this are screened on titles before reading abstracts. |
++| `title_screen_above` | `40` | Pools larger than this are screened on titles before reading abstracts. Lower = fewer tokens; abstracts are always read before a paper can be summarized. |
+ 
+ ## `full_text` (category 1)
+ | Field | Default | Meaning |
+@@ -76,7 +76,7 @@ A list of sections, each with a `title` and `subsections`. Numbered in order (1,
+ |---|---|---|
+ | 1 | Specific research | Bullets: Context, Aims, Methods, Results, Conclusions. Full text read. Other new papers listed. |
+ | 2 | Opening on the same field | At most 10 sentences, mostly context, methods and conclusions, in the field's vocabulary. |
+-| 3 | Opening on other fields | At most 10 sentences, for a high-school science student. Field tag and news link. |
++| 3 | Opening on other fields | At most 10 sentences, for a high-school science student. Field tag and news link. Research papers only. |
+ 
+ ## Field tags (category 3)
+ Astronomy & astrophysics · Physics · Chemistry & materials · Biology · Medicine & health ·
+diff --git a/plugins/town-crier/skills/cry/scripts/tc.py b/plugins/town-crier/skills/cry/scripts/tc.py
+index d262576..ad6c6fa 100644
+--- a/plugins/town-crier/skills/cry/scripts/tc.py
++++ b/plugins/town-crier/skills/cry/scripts/tc.py
+@@ -1,6 +1,7 @@
+ #!/usr/bin/env python3
+ """Town Crier run tools. Usage: ``python3 tc.py <command> --help``."""
+ 
++import os
+ import sys
+ from pathlib import Path
+ 
+@@ -9,4 +10,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))  # find the towncrier p
+ from towncrier.cli import main  # noqa: E402
+ 
+ if __name__ == "__main__":
+-    sys.exit(main())
++    try:
++        sys.exit(main())
++    except BrokenPipeError:
++        # output closed early (e.g. piped to head): stop quietly, as Python's docs advise
++        devnull = os.open(os.devnull, os.O_WRONLY)
++        os.dup2(devnull, sys.stdout.fileno())
++        sys.exit(1)
+diff --git a/plugins/town-crier/skills/cry/scripts/towncrier/assemble.py b/plugins/town-crier/skills/cry/scripts/towncrier/assemble.py
+index 1053d50..3d26255 100644
+--- a/plugins/town-crier/skills/cry/scripts/towncrier/assemble.py
++++ b/plugins/town-crier/skills/cry/scripts/towncrier/assemble.py
+@@ -42,9 +42,14 @@ def load_summaries(run_dir):
+ 
+ 
+ def link_title(rec):
+-    """Title safe inside Markdown link text."""
++    """Title safe inside Markdown link text: no brackets, no HTML tags.
++
++    Math in titles such as ``<B>`` or ``0.4<z<4`` would otherwise be read
++    as HTML by Markdown viewers.
++    """
+     title = " ".join((rec.get("title") or "Untitled").split())
+-    return title.replace("[", "(").replace("]", ")")
++    title = title.replace("[", "(").replace("]", ")")              # keep link syntax intact
++    return title.replace("<", "&lt;").replace(">", "&gt;")          # shown as < and >
+ 
+ 
+ def entry_header(rec, judgment, category, news, labels):
+diff --git a/plugins/town-crier/skills/cry/scripts/towncrier/cli.py b/plugins/town-crier/skills/cry/scripts/towncrier/cli.py
+index d3eea7d..2796019 100644
+--- a/plugins/town-crier/skills/cry/scripts/towncrier/cli.py
++++ b/plugins/town-crier/skills/cry/scripts/towncrier/cli.py
+@@ -120,7 +120,7 @@ def cmd_load(args):
+     files.write_json(run_dir / "pools.json", pools)
+     for note in notes:
+         add_note(run_dir, note)
+-    limit = int((resolved.get("selection") or {}).get("title_screen_above", 120))
++    limit = int((resolved.get("selection") or {}).get("title_screen_above", 40))
+     _print(f"{len(records)} papers in the period; {len(cands)} candidates")
+     for sub in config_mod.iter_subsections(resolved):
+         n = len(pools[sub["id"]])
+diff --git a/plugins/town-crier/skills/cry/scripts/towncrier/prefilter.py b/plugins/town-crier/skills/cry/scripts/towncrier/prefilter.py
+index 1075f80..71957de 100644
+--- a/plugins/town-crier/skills/cry/scripts/towncrier/prefilter.py
++++ b/plugins/town-crier/skills/cry/scripts/towncrier/prefilter.py
+@@ -3,7 +3,8 @@
+ Keywords match whole words, case-insensitively, in the title and abstract.
+ A trailing ``*`` matches any ending (``stream*`` matches ``streams``).
+ Hyphens, slashes and LaTeX markup are read as spaces (``GD-1`` matches
+-``GD 1``).
++``GD 1``). ``exclude_titles`` match the whole title, or its start when they
++end with ``*``.
+ """
+ 
+ import re
+@@ -41,6 +42,25 @@ def compile_keyword(keyword):
+     return re.compile(r"(?<![a-z0-9])" + re.escape(core) + tail)
+ 
+ 
++def compile_title(title):
++    """Regex for one excluded title.
++
++    Parameters
++    ----------
++    title : str
++        Whole title; trailing ``*`` for titles that start with it.
++
++    Returns
++    -------
++    re.Pattern
++        Anchored pattern applied to the normalized title.
++    """
++    raw = title.strip()
++    prefix = raw.endswith("*")
++    core = normalize(raw.rstrip("*"))
++    return re.compile("^" + re.escape(core) + ("" if prefix else "$"))  # whole title unless *
++
++
+ @dataclass
+ class ThemeFilter:
+     """Stage-1 filter of one theme."""
+@@ -49,6 +69,7 @@ class ThemeFilter:
+     any_of: list = field(default_factory=list)
+     all_of: list = field(default_factory=list)
+     exclude: list = field(default_factory=list)
++    exclude_titles: list = field(default_factory=list)
+     authors: list = field(default_factory=list)
+ 
+     @classmethod
+@@ -60,6 +81,7 @@ class ThemeFilter:
+             any_of=[compile_keyword(k) for k in kw.get("any") or []],
+             all_of=[compile_keyword(k) for k in kw.get("all") or []],
+             exclude=[compile_keyword(k) for k in kw.get("exclude") or []],
++            exclude_titles=[compile_title(t) for t in kw.get("exclude_titles") or []],
+             authors=[normalize(a) for a in theme.get("authors") or [] if a],
+         )
+ 
+@@ -102,6 +124,9 @@ class ThemeFilter:
+         """
+         if not self.in_scope(rec):
+             return False
++        title = normalize(rec.get("title", ""))
++        if any(p.match(title) for p in self.exclude_titles):
++            return False  # e.g. a journal's digest page
+         text = normalize(f"{rec.get('title', '')} {rec.get('abstract', '')}")
+         if any(p.search(text) for p in self.exclude):
+             return False
+diff --git a/plugins/town-crier/skills/cry/scripts/towncrier/sheets.py b/plugins/town-crier/skills/cry/scripts/towncrier/sheets.py
+index 7159091..df71bb6 100644
+--- a/plugins/town-crier/skills/cry/scripts/towncrier/sheets.py
++++ b/plugins/town-crier/skills/cry/scripts/towncrier/sheets.py
+@@ -50,7 +50,8 @@ def render(sub, recs, *, titles_only=False):
+         Sheet text.
+     """
+     head = [f"# Subsection {sub['id']}: {sub['title']} (theme {sub['theme']}, category {sub['category']}, "
+-            f"rank by {sub['rank_by']})", f"{len(recs)} candidates."]
++            f"rank by {sub['rank_by']})", f"{len(recs)} candidates.",
++            "Not a paper (news, editorial, commentary, perspective, profile, digest page): always n."]
+     if sub["category"] == 3:
+         head.append("Field tags: " + " | ".join(vocab.FIELDS))
+     lines = head + [""]
+diff --git a/plugins/town-crier/skills/cry/scripts/towncrier/themes.py b/plugins/town-crier/skills/cry/scripts/towncrier/themes.py
+index 1f4849d..b333520 100644
+--- a/plugins/town-crier/skills/cry/scripts/towncrier/themes.py
++++ b/plugins/town-crier/skills/cry/scripts/towncrier/themes.py
+@@ -110,7 +110,7 @@ def validate(theme, name=None):
+         if not ISSN_RE.match(issn):
+             errors.append(f"databases.openalex: '{issn}' is not an ISSN (NNNN-NNNN)")
+     keywords = theme.get("keywords") or {}
+-    for key in ("any", "all", "exclude"):
++    for key in ("any", "all", "exclude", "exclude_titles"):
+         value = keywords.get(key) or []
+         if not isinstance(value, list) or not all(isinstance(v, str) and v.strip() for v in value):
+             errors.append(f"keywords.{key}: list of non-empty strings")
+diff --git a/plugins/town-crier/skills/cry/scripts/towncrier/vocab.py b/plugins/town-crier/skills/cry/scripts/towncrier/vocab.py
+index 08a7b70..46ed744 100644
+--- a/plugins/town-crier/skills/cry/scripts/towncrier/vocab.py
++++ b/plugins/town-crier/skills/cry/scripts/towncrier/vocab.py
+@@ -16,9 +16,10 @@ FIELDS = (
+ # kinds of paper, judged by Claude
+ KINDS = ("research", "review", "proceedings", "erratum", "other")
+ 
+-# kinds allowed in summaries, per category (lists of category 1 keep all)
++# kinds allowed in summaries, per category (lists of category 1 keep all);
++# "other" = data release, catalogue, instrument, software or white paper
+ SUMMARY_KINDS = {1: {"research", "review", "proceedings", "other"}, 2: {"research", "other"},
+-                 3: {"research", "other"}}
++                 3: {"research"}}
+ 
+ # sections that can be read from full texts
+ SECTIONS = ("abstract", "introduction", "methods", "results", "discussion", "conclusions")
+diff --git a/plugins/town-crier/skills/define-theme/SKILL.md b/plugins/town-crier/skills/define-theme/SKILL.md
+index 0d79c88..4e60d16 100644
+--- a/plugins/town-crier/skills/define-theme/SKILL.md
++++ b/plugins/town-crier/skills/define-theme/SKILL.md
+@@ -26,6 +26,8 @@ Templates: `templates/theme.yaml` and `templates/theme-SKILL.md.txt` in this fol
+      categories (then stage 2 does all the filtering).
+    - `all`: papers must match every one. Rarely needed.
+    - `exclude`: papers matching one are dropped. Use for known false positives.
++   - `exclude_titles`: whole titles to drop, e.g. a journal's weekly digest page; a trailing
++     `*` drops titles that start with it. Safer than `exclude` for recurring non-papers.
+    - Matching is on title and abstract, whole words, case-insensitive; `*` at the end
+      matches any ending (`stream*`); hyphens count as spaces (`GD-1` matches `GD 1`).
+    - `authors`: names or collaborations whose papers are always kept.
+diff --git a/plugins/town-crier/skills/define-theme/templates/theme.yaml b/plugins/town-crier/skills/define-theme/templates/theme.yaml
+index e2c8dd4..8eca463 100644
+--- a/plugins/town-crier/skills/define-theme/templates/theme.yaml
++++ b/plugins/town-crier/skills/define-theme/templates/theme.yaml
+@@ -14,6 +14,7 @@ keywords:
+   any: []                   # at least one must match (title or abstract); empty = keep all
+   all: []                   # all must match
+   exclude: []               # none may match
++  exclude_titles: []        # whole titles to drop; "Profile of*" drops titles starting so
+ authors: []                 # names or collaborations always kept
+ examples: []                # arXiv ids of typical papers, written "arXiv:YYMM.NNNNN"
+ skills:                     # optional theme skills used by default for this theme
+diff --git a/plugins/town-crier/skills/select-papers/SKILL.md b/plugins/town-crier/skills/select-papers/SKILL.md
+index b1dc560..f80f704 100644
+--- a/plugins/town-crier/skills/select-papers/SKILL.md
++++ b/plugins/town-crier/skills/select-papers/SKILL.md
+@@ -12,10 +12,16 @@ removes duplicates across subsections and counts papers per theme.
+ ## For each subsection, in order
+ 1. **Theme.** Load the theme skill `town-crier:theme-<theme>`. It defines what is on theme
+    and how to score.
+-2. **Read the candidates.**
+-   - Pool up to `selection.title_screen_above` papers: `TC sheet --run RUN --sub <id>`.
+-   - Larger pool: `TC sheet --run RUN --sub <id> --titles`. Judge clear cases from the title.
+-     For the others, read abstracts with `TC sheet --run RUN --sub <id> --ids <id1>,<id2>,...`.
++2. **Read the candidates.** `TC load` printed which way to read each subsection.
++   - Pool of up to `selection.title_screen_above` papers (default 40):
++     `TC sheet --run RUN --sub <id>`.
++   - Larger pool, titles first: `TC sheet --run RUN --sub <id> --titles`.
++     - Plainly off theme, or not a paper (see below), from the title alone: `n`.
++     - Plainly on theme but not a candidate for a summary: `y`, score 1.
++     - Every other paper, and every paper that could be summarized (at least the best
++       3 × `n_papers` by title): read its abstract with
++       `TC sheet --run RUN --sub <id> --ids <id1>,<id2>,...`.
++     - Give a score of 2 or 3 only after reading the abstract.
+    - Empty pool: skip the subsection.
+ 3. **Judge.** Write one line per candidate to `RUN/judgments_<id>.txt`:
+    ```
+@@ -23,13 +29,21 @@ removes duplicates across subsections and counts papers per theme.
+    <paper_id> | n
+    ```
+    - `y` if the paper fits the theme's targeted science, `n` otherwise.
++   - **Not a paper:** news, editorial, commentary, perspective, policy piece, profile,
++     obituary, book review, or a journal's digest page. Always `n`, whatever the theme.
++     A very short abstract often signals one.
+    - Score 1-3, by the subsection's `rank_by` (printed in the sheet header):
+      - `relevance` (category 1): how closely the paper fits the theme. Use the theme's scale.
+      - `impact` (categories 2 and 3): strength of the result. Favour a new measurement or
+        detection, a high significance, a large data set, a first of its kind, a data release.
+-   - Kind: `research`, `review`, `proceedings`, `erratum` or `other`. The sheet's flags are
+-     hints; decide from the paper. Reviews, proceedings and errata are never summarized in
+-     categories 2 and 3.
++   - Kind (the sheet's flags are hints; decide from the paper):
++     - `research`: a research paper;
++     - `review`: a review article;
++     - `proceedings`: a conference contribution;
++     - `erratum`: a correction to an earlier paper;
++     - `other`: a data release, catalogue, instrument, software or white paper.
++   - What each category can summarize: category 1, every kind but `erratum`;
++     category 2, `research` and `other`; category 3, `research` only.
+    - Field: category 3 only, one tag from the sheet header.
+ 4. **Save.** `TC judge --run RUN --sub <id> --file RUN/judgments_<id>.txt`. Fix any error
+    it reports (every candidate judged exactly once).
+diff --git a/plugins/town-crier/skills/theme-science-at-large/SKILL.md b/plugins/town-crier/skills/theme-science-at-large/SKILL.md
+index 9204440..4f25b25 100644
+--- a/plugins/town-crier/skills/theme-science-at-large/SKILL.md
++++ b/plugins/town-crier/skills/theme-science-at-large/SKILL.md
+@@ -5,12 +5,21 @@ description: Theme definition for the Town Crier digest - major results of the p
+ 
+ # Theme: science at large
+ 
+-`theme.yaml` (same folder) lists the journals fetched from OpenAlex. Every research
+-article of the period is a candidate. This text guides stage 2.
++`theme.yaml` (same folder) lists the journals fetched from OpenAlex and drops the journals'
++weekly digest pages in stage 1. Every other article of the period is a candidate. This text
++guides stage 2.
+ 
+ ## On theme
+-Every research article. Mark commentaries, news, editorials and reviews as off theme or
+-with kind `review`/`other`.
++Research articles reporting a new result, in any field. Kind `research`.
++
++## Off theme (`n`)
++Everything else, which OpenAlex also labels as articles:
++- news, editorials, commentaries, perspectives, policy forums, letters;
++- profiles, obituaries, book reviews;
++- reviews: this section reports new results.
++
++A short abstract or an opinion-style title usually means one of these. Read the abstract
++when unsure.
+ 
+ ## Field tag (required)
+ Give each on-theme paper one tag from the list printed at the top of the review sheet.
+diff --git a/plugins/town-crier/skills/theme-science-at-large/theme.yaml b/plugins/town-crier/skills/theme-science-at-large/theme.yaml
+index 49912ba..3635923 100644
+--- a/plugins/town-crier/skills/theme-science-at-large/theme.yaml
++++ b/plugins/town-crier/skills/theme-science-at-large/theme.yaml
+@@ -19,6 +19,7 @@ keywords:
+   any: []
+   all: []
+   exclude: []
++  exclude_titles: ["In Science Journals", "In Other Journals"]   # Science's weekly digest pages
+ authors: []
+ examples: []
+ skills:
+diff --git a/tests/run/assemble/test_assemble.py b/tests/run/assemble/test_assemble.py
+index 209adfe..e9913d7 100644
+--- a/tests/run/assemble/test_assemble.py
++++ b/tests/run/assemble/test_assemble.py
+@@ -60,3 +60,12 @@ def test_parse_summaries():
+     """Bodies are split on paper markers."""
+     text = "<!-- paper: arXiv:1 -->\nBody one.\n\n<!-- paper: doi:10.1/x -->\nBody two.\n"
+     assert assemble.parse_summaries(text) == {"arXiv:1": "Body one.", "doi:10.1/x": "Body two."}
++
++
++@pytest.mark.run
++@pytest.mark.assemble
++@pytest.mark.unit
++def test_titles_cannot_become_html():
++    """Angle brackets in titles are escaped; brackets cannot break the link."""
++    rec = {"title": "Field <B> in galaxies at 0.4<z<4 [new]"}
++    assert assemble.link_title(rec) == "Field &lt;B&gt; in galaxies at 0.4&lt;z&lt;4 (new)"
+diff --git a/tests/run/config/test_config.py b/tests/run/config/test_config.py
+index 60172c6..06b7052 100644
+--- a/tests/run/config/test_config.py
++++ b/tests/run/config/test_config.py
+@@ -63,3 +63,11 @@ def test_plugin_themes_are_valid(plugin_themes):
+     """Every theme shipped with the plugin passes validation."""
+     for name, theme in plugin_themes.items():
+         assert themes.validate(theme, name) == [], name
++
++
++@pytest.mark.run
++@pytest.mark.config
++@pytest.mark.unit
++def test_title_screening_default():
++    """Pools above 40 candidates are screened on titles first by default."""
++    assert config.load()["selection"]["title_screen_above"] == 40
+diff --git a/tests/run/prefilter/test_prefilter.py b/tests/run/prefilter/test_prefilter.py
+index b321a06..2c8456e 100644
+--- a/tests/run/prefilter/test_prefilter.py
++++ b/tests/run/prefilter/test_prefilter.py
+@@ -2,6 +2,7 @@
+ 
+ import pytest
+ 
++from towncrier import config, themes
+ from towncrier.prefilter import ThemeFilter, compile_keyword, normalize
+ 
+ 
+@@ -46,3 +47,34 @@ def test_theme_filter(theme):
+     assert not f.passes(rec("Stellar streams and cold streams"))                    # excluded
+     assert f.passes(rec("Dynamics of the halo", authors=("Ana Bonaca",)))           # author
+     assert not f.passes(rec("Dynamics of the halo"))
++
++
++def journal(title, abstract="We report a new result."):
++    """Minimal OpenAlex record from Science."""
++    return {"source": "openalex", "title": title, "abstract": abstract, "issn": ["0036-8075"], "authors": []}
++
++
++@pytest.mark.run
++@pytest.mark.prefilter
++@pytest.mark.unit
++def test_exclude_titles_whole_or_prefix():
++    """Whole titles are dropped; a trailing * drops titles that start so; abstracts are not searched."""
++    f = ThemeFilter.from_theme({"databases": {"openalex": ["0036-8075"]},
++                                "keywords": {"exclude_titles": ["In Science Journals", "Profile of*"]}})
++    assert not f.passes(journal("In Science Journals"))
++    assert not f.passes(journal("in science journals"))
++    assert not f.passes(journal("Profile of Jane Doe"))
++    assert f.passes(journal("Publication bias in science journals"))              # not the whole title
++    assert f.passes(journal("A new result", abstract="Gender gaps in science journals."))
++
++
++@pytest.mark.run
++@pytest.mark.prefilter
++@pytest.mark.unit
++def test_science_at_large_drops_digest_pages():
++    """The shipped theme removes Science's weekly digest pages and keeps research."""
++    theme = themes.load_local(config.SKILLS_DIR)["science-at-large"]
++    f = ThemeFilter.from_theme(theme)
++    assert not f.passes(journal("In Science Journals"))
++    assert not f.passes(journal("In Other Journals"))
++    assert f.passes(journal("A room-temperature superconductor"))
+diff --git a/tests/run/selection/test_selection.py b/tests/run/selection/test_selection.py
+index d9489ce..2c5f643 100644
+--- a/tests/run/selection/test_selection.py
++++ b/tests/run/selection/test_selection.py
+@@ -79,3 +79,21 @@ def test_category_3_fields():
+     records = {p: {"paper_id": p} for p in "abcd"}
+     sel = selection.finalize(resolved, {"1.1": list("abcd")}, judged, records)
+     assert [j["paper_id"] for j in sel["subsections"]["1.1"]["summaries"]] == ["b", "d"]
++
++
++@pytest.mark.run
++@pytest.mark.selection
++@pytest.mark.unit
++def test_category_3_summarizes_research_only():
++    """Kinds other than research are never summarized in category 3; category 2 keeps 'other'."""
++    J = selection.Judgment
++    resolved = {"period": {}, "sections": [{"id": "1", "subsections": [
++        sub("1.1", 3, 2, one_per_field=True, exclude_fields=[]), sub("1.2", 2, 1)]}]}
++    judged = {"1.1": [J("o", True, 3, kind="other", field="Biology"),
++                      J("v", True, 3, kind="review", field="Physics"),
++                      J("r", True, 2, kind="research", field="Chemistry & materials")],
++              "1.2": [J("d", True, 3, kind="other")]}
++    records = {p: {"paper_id": p} for p in "ovrd"}
++    sel = selection.finalize(resolved, {"1.1": list("ovr"), "1.2": ["d"]}, judged, records)
++    assert [j["paper_id"] for j in sel["subsections"]["1.1"]["summaries"]] == ["r"]
++    assert [j["paper_id"] for j in sel["subsections"]["1.2"]["summaries"]] == ["d"]

@@ -12,10 +12,16 @@ removes duplicates across subsections and counts papers per theme.
 ## For each subsection, in order
 1. **Theme.** Load the theme skill `town-crier:theme-<theme>`. It defines what is on theme
    and how to score.
-2. **Read the candidates.**
-   - Pool up to `selection.title_screen_above` papers: `TC sheet --run RUN --sub <id>`.
-   - Larger pool: `TC sheet --run RUN --sub <id> --titles`. Judge clear cases from the title.
-     For the others, read abstracts with `TC sheet --run RUN --sub <id> --ids <id1>,<id2>,...`.
+2. **Read the candidates.** `TC load` printed which way to read each subsection.
+   - Pool of up to `selection.title_screen_above` papers (default 40):
+     `TC sheet --run RUN --sub <id>`.
+   - Larger pool, titles first: `TC sheet --run RUN --sub <id> --titles`.
+     - Plainly off theme, or not a paper (see below), from the title alone: `n`.
+     - Plainly on theme but not a candidate for a summary: `y`, score 1.
+     - Every other paper, and every paper that could be summarized (at least the best
+       3 × `n_papers` by title): read its abstract with
+       `TC sheet --run RUN --sub <id> --ids <id1>,<id2>,...`.
+     - Give a score of 2 or 3 only after reading the abstract.
    - Empty pool: skip the subsection.
 3. **Judge.** Write one line per candidate to `RUN/judgments_<id>.txt`:
    ```
@@ -23,13 +29,21 @@ removes duplicates across subsections and counts papers per theme.
    <paper_id> | n
    ```
    - `y` if the paper fits the theme's targeted science, `n` otherwise.
+   - **Not a paper:** news, editorial, commentary, perspective, policy piece, profile,
+     obituary, book review, or a journal's digest page. Always `n`, whatever the theme.
+     A very short abstract often signals one.
    - Score 1-3, by the subsection's `rank_by` (printed in the sheet header):
      - `relevance` (category 1): how closely the paper fits the theme. Use the theme's scale.
      - `impact` (categories 2 and 3): strength of the result. Favour a new measurement or
        detection, a high significance, a large data set, a first of its kind, a data release.
-   - Kind: `research`, `review`, `proceedings`, `erratum` or `other`. The sheet's flags are
-     hints; decide from the paper. Reviews, proceedings and errata are never summarized in
-     categories 2 and 3.
+   - Kind (the sheet's flags are hints; decide from the paper):
+     - `research`: a research paper;
+     - `review`: a review article;
+     - `proceedings`: a conference contribution;
+     - `erratum`: a correction to an earlier paper;
+     - `other`: a data release, catalogue, instrument, software or white paper.
+   - What each category can summarize: category 1, every kind but `erratum`;
+     category 2, `research` and `other`; category 3, `research` only.
    - Field: category 3 only, one tag from the sheet header.
 4. **Save.** `TC judge --run RUN --sub <id> --file RUN/judgments_<id>.txt`. Fix any error
    it reports (every candidate judged exactly once).

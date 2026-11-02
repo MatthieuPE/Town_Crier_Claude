@@ -3,3 +3,4 @@ __pycache__/
 .pytest_cache/
 town-crier-runs/
 _data/
+.DS_Store

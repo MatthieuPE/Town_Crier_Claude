@@ -3,7 +3,8 @@
 Keywords match whole words, case-insensitively, in the title and abstract.
 A trailing ``*`` matches any ending (``stream*`` matches ``streams``).
 Hyphens, slashes and LaTeX markup are read as spaces (``GD-1`` matches
-``GD 1``).
+``GD 1``). ``exclude_titles`` match the whole title, or its start when they
+end with ``*``.
 """
 
 import re
@@ -41,6 +42,25 @@ def compile_keyword(keyword):
     return re.compile(r"(?<![a-z0-9])" + re.escape(core) + tail)
 
 
+def compile_title(title):
+    """Regex for one excluded title.
+
+    Parameters
+    ----------
+    title : str
+        Whole title; trailing ``*`` for titles that start with it.
+
+    Returns
+    -------
+    re.Pattern
+        Anchored pattern applied to the normalized title.
+    """
+    raw = title.strip()
+    prefix = raw.endswith("*")
+    core = normalize(raw.rstrip("*"))
+    return re.compile("^" + re.escape(core) + ("" if prefix else "$"))  # whole title unless *
+
+
 @dataclass
 class ThemeFilter:
     """Stage-1 filter of one theme."""
@@ -49,6 +69,7 @@ class ThemeFilter:
     any_of: list = field(default_factory=list)
     all_of: list = field(default_factory=list)
     exclude: list = field(default_factory=list)
+    exclude_titles: list = field(default_factory=list)
     authors: list = field(default_factory=list)
 
     @classmethod
@@ -60,6 +81,7 @@ class ThemeFilter:
             any_of=[compile_keyword(k) for k in kw.get("any") or []],
             all_of=[compile_keyword(k) for k in kw.get("all") or []],
             exclude=[compile_keyword(k) for k in kw.get("exclude") or []],
+            exclude_titles=[compile_title(t) for t in kw.get("exclude_titles") or []],
             authors=[normalize(a) for a in theme.get("authors") or [] if a],
         )
 
@@ -102,6 +124,9 @@ class ThemeFilter:
         """
         if not self.in_scope(rec):
             return False
+        title = normalize(rec.get("title", ""))
+        if any(p.match(title) for p in self.exclude_titles):
+            return False  # e.g. a journal's digest page
         text = normalize(f"{rec.get('title', '')} {rec.get('abstract', '')}")
         if any(p.search(text) for p in self.exclude):
             return False

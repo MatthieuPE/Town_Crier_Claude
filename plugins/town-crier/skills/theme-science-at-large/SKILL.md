@@ -5,12 +5,21 @@ description: Theme definition for the Town Crier digest - major results of the p
 
 # Theme: science at large
 
-`theme.yaml` (same folder) lists the journals fetched from OpenAlex. Every research
-article of the period is a candidate. This text guides stage 2.
+`theme.yaml` (same folder) lists the journals fetched from OpenAlex and drops the journals'
+weekly digest pages in stage 1. Every other article of the period is a candidate. This text
+guides stage 2.
 
 ## On theme
-Every research article. Mark commentaries, news, editorials and reviews as off theme or
-with kind `review`/`other`.
+Research articles reporting a new result, in any field. Kind `research`.
+
+## Off theme (`n`)
+Everything else, which OpenAlex also labels as articles:
+- news, editorials, commentaries, perspectives, policy forums, letters;
+- profiles, obituaries, book reviews;
+- reviews: this section reports new results.
+
+A short abstract or an opinion-style title usually means one of these. Read the abstract
+when unsure.
 
 ## Field tag (required)
 Give each on-theme paper one tag from the list printed at the top of the review sheet.
