@@ -106,6 +106,8 @@ def resolve_subsection(sid, sub, cfg, theme):
         out[key] = sub.get(key, value)
     for key in ("n_papers", "rank_by", "count"):
         out.setdefault(key, sub.get(key))
+    sel = cfg.get("selection") or {}
+    out["title_screen_above"] = screen_limit(sub.get("title_screen_above", sel.get("title_screen_above", 40)))
     if cat == 1:
         out["full_text"] = deep_merge(cfg.get("full_text") or {}, sub.get("full_text") or {})
     skills = sub.get("skills") or {}
@@ -115,6 +117,27 @@ def resolve_subsection(sid, sub, cfg, theme):
                       or f"summarize-category-{cat}"),
     }
     return out
+
+
+def week_end_index(cfg):
+    """Last weekday of a calendar week (Monday = 0).
+
+    ``period.week_end`` when set, else the day before ``schedule.weekday``:
+    a digest run on Sunday covers Sunday to Saturday, one run on Monday
+    covers Monday to Sunday.
+    """
+    named = (cfg.get("period") or {}).get("week_end")
+    if named:
+        return periods.weekday_index(named)
+    run_day = (cfg.get("schedule") or {}).get("weekday") or "monday"
+    return (periods.weekday_index(run_day) - 1) % 7
+
+
+def screen_limit(value):
+    """Title-screening threshold: an integer, or None when screening is off."""
+    if value in (None, False) or str(value).strip().lower() in ("off", "none", "false", "no"):
+        return None
+    return int(value)
 
 
 def resolve(cfg, themes, run_date, anchor=None):
@@ -139,7 +162,8 @@ def resolve(cfg, themes, run_date, anchor=None):
     pcfg = cfg.get("period") or {}
     per = periods.compute_period(run_date, length=pcfg.get("length", 1), unit=pcfg.get("unit", "week"),
                                  end=pcfg.get("end", "yesterday"),
-                                 anchor=anchor or pcfg.get("anchor", "rolling"))
+                                 anchor=anchor or pcfg.get("anchor", "rolling"),
+                                 week_end=week_end_index(cfg))
     sections, used = [], {}
     for i, sec in enumerate(cfg.get("sections") or [], 1):
         subs = []

@@ -13,7 +13,7 @@ removes duplicates across subsections and counts papers per theme.
 1. **Theme.** Load the theme skill `town-crier:theme-<theme>`. It defines what is on theme
    and how to score.
 2. **Read the candidates.** `TC load` printed which way to read each subsection.
-   - Pool of up to `selection.title_screen_above` papers (default 40):
+   - Pool of up to `title_screen_above` papers (default 40), or screening `off`:
      `TC sheet --run RUN --sub <id>`.
    - Larger pool, titles first: `TC sheet --run RUN --sub <id> --titles`.
      - Plainly off theme, or not a paper (see below), from the title alone: `n`.

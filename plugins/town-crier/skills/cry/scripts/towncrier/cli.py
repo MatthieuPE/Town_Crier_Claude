@@ -120,11 +120,11 @@ def cmd_load(args):
     files.write_json(run_dir / "pools.json", pools)
     for note in notes:
         add_note(run_dir, note)
-    limit = int((resolved.get("selection") or {}).get("title_screen_above", 40))
     _print(f"{len(records)} papers in the period; {len(cands)} candidates")
     for sub in config_mod.iter_subsections(resolved):
         n = len(pools[sub["id"]])
-        mode = "titles first" if n > limit else "abstracts"
+        limit = sub.get("title_screen_above")
+        mode = "titles first" if limit is not None and n > limit else "abstracts"
         _print(f"  {sub['id']} {sub['title']}: {n} candidates -> review {mode}")
     _print(*(f"NOTE {n}" for n in notes))
     return 0
