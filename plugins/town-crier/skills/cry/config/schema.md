@@ -59,6 +59,17 @@ Check a configuration with `tc.py resolve --config <file> --dry-run`.
 | `one_per_field` | — | — | `true` | At most one paper per field. |
 | `exclude_fields` | — | — | `[]` | Fields to skip (tags below). |
 
+## `themes`
+Themes written in the configuration, by name. They override plugin themes of the same name.
+| Field | Meaning |
+|---|---|
+| `title`, `description` | Name and one-paragraph scope. |
+| `databases` | `arxiv` (categories), `biorxiv` / `medrxiv` (categories or `all`), `openalex` (`journals` with ISSNs). The daily fetch reads them from `configs/*.yaml`. |
+| `keywords` | `any`, `all`, `exclude`, `exclude_titles` (stage 1, see `docs/extending.md`). |
+| `authors`, `examples` | Always-kept authors; typical papers (`arXiv:...`). |
+| `guidance` | Free text for stage 2: on and off theme, scoring. Printed on each review sheet. |
+| `skills` | Optional theme skills (`extract`, `summarize: {N: ...}`). |
+
 ## `sections`
 A list of sections, each with a `title` and `subsections`. Numbered in order (1, 1.1, ...).
 
@@ -69,6 +80,7 @@ A list of sections, each with a `title` and `subsections`. Numbered in order (1,
 | `title` | no | Heading; default: the theme's title. |
 | `n_papers`, `rank_by`, `count`, `list_others`, `one_per_field`, `exclude_fields` | no | Override the category defaults. |
 | `title_screen_above` | no | Overrides `selection.title_screen_above`, e.g. `off` for one subsection. |
+| `guidance` | no | Extra judging rules for this subsection only, printed on its review sheet. |
 | `full_text` | no | Overrides `full_text` (category 1). |
 | `skills.extract` | no | Theme skill extending `extract-paper`. |
 | `skills.summarize` | no | Theme skill extending `summarize-category-<category>`. |

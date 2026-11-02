@@ -58,6 +58,37 @@ def load_theme(path):
     return theme
 
 
+def load_config_themes(paths):
+    """Themes defined in the ``themes`` block of configurations.
+
+    Parameters
+    ----------
+    paths : iterable of Path
+        Configuration files (``configs/*.yaml``).
+
+    Returns
+    -------
+    themes : dict
+        Theme name -> definition.
+    errors : list of str
+        Problems found.
+    """
+    themes, errors = {}, []
+    for path in paths:
+        try:
+            cfg = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError as exc:
+            errors.append(f"{path}: {exc}")
+            continue
+        for name, theme in (cfg.get("themes") or {}).items():
+            dbs = (theme or {}).get("databases") or {}
+            if not any(dbs.get(db) for db in DATABASES):
+                errors.append(f"{path}: theme {name}: declare at least one database")
+                continue
+            themes[str(name)] = dict(theme, name=str(name))
+    return themes, errors
+
+
 def load_themes(paths):
     """Load all valid themes; log and skip invalid ones.
 

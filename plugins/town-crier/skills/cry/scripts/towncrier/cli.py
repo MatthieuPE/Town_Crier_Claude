@@ -69,7 +69,8 @@ def cmd_resolve(args):
         remote = source.index().get("themes") or {}
     except (FileNotFoundError, ValueError, urllib.error.URLError, OSError) as exc:
         data_warning = f"data index not readable ({exc}); using installed themes only"
-    all_themes = themes_mod.merge(local, remote)
+    inline = themes_mod.from_config(cfg)                      # themes in the configuration win
+    all_themes = themes_mod.merge(themes_mod.merge(local, remote), inline)
     run_date = dt.date.fromisoformat(args.run_date) if args.run_date else dt.date.today()
     try:
         resolved = config_mod.resolve(cfg, all_themes, run_date, anchor=args.anchor)
@@ -188,7 +189,8 @@ def cmd_sheet(args):
         wanted = set(args.ids.split(","))
         pool = [p for p in pool if p in wanted]
     recs = _records(run_dir)
-    _print(sheets.render(sub, [recs[p] for p in pool], titles_only=args.titles))
+    theme = (_resolved(run_dir).get("themes") or {}).get(sub["theme"]) or {}
+    _print(sheets.render(sub, [recs[p] for p in pool], titles_only=args.titles, theme=theme))
     return 0
 
 
@@ -328,7 +330,13 @@ def cmd_validate_theme(args):
 
 def cmd_theme_test(args):
     """Count the papers a theme's stage-1 filter keeps over the last days."""
-    theme = files.read_yaml(args.theme)
+    if args.config:
+        theme = themes_mod.from_config(files.read_yaml(args.config)).get(args.theme)
+        if theme is None:
+            _print(f"ERROR no theme '{args.theme}' in the themes block of {args.config}")
+            return EXIT_ERRORS
+    else:
+        theme = files.read_yaml(args.theme)
     errors = themes_mod.validate(theme)
     if errors:
         _print(*(f"ERROR {e}" for e in errors))
@@ -462,7 +470,8 @@ def build_parser():
     p.set_defaults(func=cmd_validate_theme)
 
     p = sub.add_parser("theme-test", help="try a theme's filter on the last days of data")
-    p.add_argument("--theme", required=True, help="theme.yaml path")
+    p.add_argument("--theme", required=True, help="theme.yaml path, or a theme name with --config")
+    p.add_argument("--config", help="configuration whose themes block defines --theme")
     p.add_argument("--days", type=int, default=7)
     p.add_argument("--samples", type=int, default=5)
     p.add_argument("--repository", default="MatthieuPE/Town_Crier_Claude")

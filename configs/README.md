@@ -4,6 +4,7 @@ One file per user: `configs/<name>.yaml`. Scheduled runs read it from the `main`
 at each run, so editing and pushing it changes the next digest; no new scheduled task is
 needed.
 
+- Full example with its own themes: [`stream_digest.yaml`](stream_digest.yaml).
 - Start from [`example-stellar-streams.yaml`](example-stellar-streams.yaml), or ask Claude
   *"Set up my Town Crier"* (`configure` skill).
 - Only write the values that differ from the

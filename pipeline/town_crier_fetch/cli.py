@@ -20,6 +20,7 @@ DEFAULT_SETTINGS = {
     "biorxiv": {"delay_seconds": 1.0},
     "openalex": {"per_page": 100, "delay_seconds": 1.0, "max_pages": 50},
     "themes_glob": "plugins/town-crier/skills/theme-*/theme.yaml",
+    "configs_glob": "configs/*.yaml",
 }
 
 
@@ -196,6 +197,10 @@ def main(argv=None, *, getter=None, sleep=None):
     data_dir = Path(args.data_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
     theme_defs, errors = themes.load_themes(themes.find_theme_files(args.repo_root, settings["themes_glob"]))
+    config_defs, config_errors = themes.load_config_themes(
+        themes.find_theme_files(args.repo_root, settings["configs_glob"]))
+    theme_defs.update(config_defs)                     # themes written in configurations
+    errors.extend(config_errors)
     if not theme_defs:
         errors.append("no valid theme definition found")
     plan = themes.build_plan(theme_defs)

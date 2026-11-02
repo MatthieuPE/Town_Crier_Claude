@@ -25,7 +25,10 @@ Field reference: `config/schema.md` of the cry skill. Default: `config/default.y
 5. **Period and language.** Default: one week, English.
 6. **Numbers of papers.** Defaults: 3 (category 1), 1 (category 2), 3 (category 3).
 
-For a theme that does not exist yet, offer the `define-theme` skill, then come back.
+Themes can come from the plugin (`theme-*` folders) or be written in the configuration's
+`themes` block. For a new theme, follow the `define-theme` skill, then come back.
+A subsection can also carry `guidance`: extra judging rules for that subsection only.
+Full example: `configs/stream_digest.yaml`.
 
 ## Write and check
 1. Write `<name>.yaml` in the working folder with only the non-default values. Keep

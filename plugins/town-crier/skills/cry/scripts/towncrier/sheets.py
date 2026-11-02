@@ -32,7 +32,19 @@ def where(rec):
     return ", ".join(rec.get("categories") or []) or rec.get("source", "")
 
 
-def render(sub, recs, *, titles_only=False):
+def guidance_lines(sub, theme):
+    """Theme description and guidance, and the subsection's own guidance."""
+    lines = []
+    if theme.get("description"):
+        lines.append("Theme: " + " ".join(str(theme["description"]).split()))
+    if theme.get("guidance"):
+        lines += ["Theme guidance:", str(theme["guidance"]).strip()]
+    if sub.get("guidance"):
+        lines += ["Subsection guidance:", str(sub["guidance"]).strip()]
+    return lines
+
+
+def render(sub, recs, *, titles_only=False, theme=None):
     """Markdown sheet of a subsection's candidates.
 
     Parameters
@@ -43,6 +55,8 @@ def render(sub, recs, *, titles_only=False):
         Candidate records.
     titles_only : bool
         One line per paper, no abstracts.
+    theme : dict, optional
+        Theme definition; its description and guidance head the sheet.
 
     Returns
     -------
@@ -52,6 +66,7 @@ def render(sub, recs, *, titles_only=False):
     head = [f"# Subsection {sub['id']}: {sub['title']} (theme {sub['theme']}, category {sub['category']}, "
             f"rank by {sub['rank_by']})", f"{len(recs)} candidates.",
             "Not a paper (news, editorial, commentary, perspective, profile, digest page): always n."]
+    head += guidance_lines(sub, theme or {})
     if sub["category"] == 3:
         head.append("Field tags: " + " | ".join(vocab.FIELDS))
     lines = head + [""]

@@ -10,8 +10,9 @@ removes duplicates across subsections and counts papers per theme.
 `TC` is `python3 <cry skill folder>/scripts/tc.py`; `RUN` is the run folder.
 
 ## For each subsection, in order
-1. **Theme.** Load the theme skill `town-crier:theme-<theme>`. It defines what is on theme
-   and how to score.
+1. **Theme.** The sheet header prints the theme's description and guidance (from the
+   configuration's `themes` block or the plugin's theme), and any subsection guidance.
+   If the plugin has a theme skill `town-crier:theme-<theme>`, load it too.
 2. **Read the candidates.** `TC load` printed which way to read each subsection.
    - Pool of up to `title_screen_above` papers (default 40), or screening `off`:
      `TC sheet --run RUN --sub <id>`.

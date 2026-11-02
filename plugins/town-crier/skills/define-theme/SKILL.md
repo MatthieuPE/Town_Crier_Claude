@@ -1,16 +1,20 @@
 ---
 name: define-theme
-description: Use when the user wants to create or tune a Town Crier theme - the science it targets, its databases and categories, keywords, authors and example papers - so that the pipeline finds the right papers efficiently. Writes a theme-<name> folder for the plugin.
+description: Use when the user wants to create or tune a Town Crier theme - the science it targets, its databases and categories, keywords, authors and example papers - so that the pipeline finds the right papers efficiently. Writes the theme into the themes block of their configuration.
 ---
 
 # Define a theme
 
-A theme is a sub-skill of the paper search. It is a folder `theme-<name>/` with:
-- `theme.yaml`: databases, categories, keywords, authors, examples. The daily fetch reads
-  its databases; stage 1 applies its keywords and authors to every new paper.
-- `SKILL.md`: the targeted science and how to score papers. Claude reads it in stage 2.
-
-Templates: `templates/theme.yaml` and `templates/theme-SKILL.md.txt` in this folder.
+A theme is written in the `themes` block of the user's configuration (`configs/<name>.yaml`),
+under its name. No skill file is needed. Its fields:
+- `title`, `description`;
+- `databases`, `keywords`, `authors`, `examples`: the daily fetch reads its databases;
+  stage 1 applies its keywords and authors to every new paper;
+- `guidance`: the targeted science, what is on and off theme, how to score. Claude reads it
+  at the top of each review sheet in stage 2.
+Full example: `configs/stream_digest.yaml` at the repository root.
+Themes meant for everyone can still be shipped in the plugin as `theme-<name>/` folders
+(templates in this folder); a theme in a configuration overrides one of the same name.
 `TC` is `python3 <cry skill folder>/scripts/tc.py`.
 
 ## Steps
@@ -34,22 +38,22 @@ Templates: `templates/theme.yaml` and `templates/theme-SKILL.md.txt` in this fol
 4. **Examples.** If the user has none, find 3 to 5 typical papers with alphaXiv
    `discover_papers` and ask the user to confirm them. Record their arXiv ids in `examples`.
    Never write an id that a tool did not return.
-5. **Test.** Write the draft to `theme-<name>/theme.yaml`, then:
-   - `TC validate-theme --theme theme-<name>/theme.yaml`, and fix any error;
-   - `TC theme-test --theme theme-<name>/theme.yaml --days 7`.
+5. **Test.** Write the draft into the configuration's `themes` block, then:
+   - `TC resolve --config <file> --dry-run`, and fix any error;
+   - `TC theme-test --config <file> --theme <name> --days 7`.
 
    Show the user the count and the sample titles. Too many off-theme papers: add keywords
    to `exclude` or narrow `any`. Too few: widen `any`. Repeat up to three times.
    A `NOTE ... not fetched yet` means a category is new: the test can only run after the
    next daily fetch. Then use alphaXiv `discover_papers` on the last week as a rough check.
-6. **Write `SKILL.md`** from the template: targeted science, what is on and off theme, and
-   a scoring scale for relevance and for impact.
-7. **Deliver.** Send both files. Tell the user to add the folder to
-   `plugins/town-crier/skills/`, bump `version` in `plugin.json`, push, and refresh the
-   plugin. New categories are fetched from the next daily run; the GitHub Action can also
-   be run by hand, with `backfill_days` set to the length of their period.
+6. **Write `guidance`**: targeted science, what is on and off theme, and a scoring scale for
+   relevance and for impact.
+7. **Deliver.** Send the configuration. The user commits it to `configs/<name>.yaml`; no
+   plugin update is needed. New categories are fetched from the next daily run; the GitHub
+   Action can also be run by hand, with `backfill_days` set to the length of their period.
 
 ## Rules
-- The `name` field must equal the folder name without `theme-`.
+- Theme names: lowercase words joined by hyphens. In a plugin folder, `name` must equal the
+  folder name without `theme-`.
 - Keep keywords specific: each one should rarely match an off-theme paper.
 - Draft keywords are a starting point; the test decides.

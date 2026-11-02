@@ -88,3 +88,19 @@ def test_sunday_schedule_and_screening_off(tmp_path, plugin_themes):
     assert (resolved["period"]["start"], resolved["period"]["end"]) == ("2026-11-01", "2026-11-07")
     subs = list(config.iter_subsections(resolved))
     assert subs[0]["title_screen_above"] is None and subs[1]["title_screen_above"] == 25
+
+
+@pytest.mark.run
+@pytest.mark.config
+@pytest.mark.unit
+def test_themes_written_in_configuration(repo_root, plugin_themes):
+    """The shipped stream_digest example resolves with its own themes and guidance."""
+    import datetime as dt
+    cfg = config.load(repo_root / "configs" / "stream_digest.yaml")
+    all_themes = themes.merge(plugin_themes, themes.from_config(cfg))
+    resolved = config.resolve(cfg, all_themes, dt.date(2026, 11, 8), anchor="calendar")
+    errors, _ = config.validate(cfg, resolved, all_themes)
+    assert errors == []
+    assert (resolved["period"]["start"], resolved["period"]["end"]) == ("2026-11-01", "2026-11-07")
+    assert resolved["themes"]["streams-dark-matter"]["guidance"].startswith("On theme")
+    assert list(config.iter_subsections(resolved))[-1]["guidance"].startswith("Astronomy")
