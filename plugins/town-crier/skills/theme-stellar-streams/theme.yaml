@@ -1,0 +1,21 @@
+# Theme definition: read by the daily fetch (databases) and by the run (keywords).
+# Draft keywords: review them with the define-theme skill.
+name: stellar-streams
+title: Stellar streams
+description: >-
+  Detection, modelling and dynamics of stellar streams and tidal tails in the
+  Milky Way and nearby galaxies, their progenitors (globular clusters, dwarf
+  galaxies), and their use to constrain the Galactic potential, the dark matter
+  halo and its substructure.
+databases:
+  arxiv: [astro-ph.GA, astro-ph.SR, astro-ph.CO]
+keywords:
+  any: ["stellar stream*", "tidal stream*", "tidal tail*", "stream member*", "stream gap*",
+        "GD-1", "Pal 5", "Palomar 5", "Sagittarius stream", "Orphan stream", "Jhelum"]
+  all: []
+  exclude: []
+authors: []
+examples: []
+skills:
+  extract: null
+  summarize: {1: null, 2: null, 3: null}

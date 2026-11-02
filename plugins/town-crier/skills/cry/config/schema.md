@@ -1,78 +1,84 @@
 # Configuration reference
 
-A configuration is a YAML file. Start from `default.yaml`.
-A user configuration is merged over the default, key by key.
-A `sections` list given by the user replaces the default list entirely.
-Any value in `<angle brackets>` is a placeholder and must be filled in.
+A configuration is a YAML file. It only needs the values that differ from `default.yaml`.
+It is merged over the default key by key; a `sections` list replaces the default list
+entirely. Values in `<angle brackets>` are placeholders that must be filled in.
+Check a configuration with `tc.py resolve --config <file> --dry-run`.
+
+## `data`
+| Field | Default | Meaning |
+|---|---|---|
+| `repository` | `MatthieuPE/Town_Crier_Claude` | GitHub repository holding the data branch. |
+| `branch` | `data` | Branch written by the daily fetch. |
 
 ## `period`
 | Field | Values | Default | Meaning |
 |---|---|---|---|
 | `length` | integer ≥ 1 | `1` | Number of units covered. |
-| `unit` | `day`, `week`, `month` | `week` | Unit of the period. |
-| `end` | `today` or `YYYY-MM-DD` | `today` | Last day covered (included). |
-
-The period starts `length` × `unit` before `end`. Months are calendar months.
-Label used in the output: "today", "this week", "this month", or "in the last N weeks".
+| `unit` | `day`, `week`, `month` | `week` | Unit. |
+| `end` | `yesterday`, `today`, `YYYY-MM-DD` | `yesterday` | Last covered day (rolling anchor). |
+| `anchor` | `rolling`, `calendar` | `rolling` | Rolling: `length` units ending on `end`. Calendar: Monday–Sunday weeks, half-months (1st–14th, 15th–end) for 2 weeks, calendar months; always ending before the run day. Scheduled tasks use `calendar`. |
 
 ## `output`
 | Field | Default | Meaning |
 |---|---|---|
-| `title` | `The Town Crier` | Title of the output file. |
-| `language` | `English` | Language of the whole output. |
-| `filename` | `town-crier_{start}_{end}.md` | Output file name. `{start}` and `{end}` are dates. |
-| `delivery` | `file` | TODO: `file` (sent to the user) or `artifact` (shareable page). |
+| `title` | `The Town Crier` | Digest title. |
+| `language` | `English` | Language of the digest. English, French and Italian have built-in headings. |
+| `filename` | `town-crier_{start}_{end}.md` | File name; `{start}`, `{end}` are dates. |
+| `delivery` | `file` | Markdown file sent in the conversation. |
+| `contents` | `true` | Table of contents under the header. |
 
-## `schedule`
-Used only by the `schedule-cry` skill.
+## `schedule` (used by `schedule-cry`)
 | Field | Default | Meaning |
 |---|---|---|
-| `weekday` | `monday` | Run day when `period.unit` is `week`. |
-| `day_of_month` | `1` | Run day when `period.unit` is `month`. |
+| `weekday` | `monday` | Run day of weekly digests. |
+| `day_of_month` | `1` | Run day of monthly digests. |
 | `time` | `08:00` | Local run time. |
-| `timezone` | `null` | IANA name (e.g. `Europe/Paris`). Asked when null. |
+| `timezone` | `null` | IANA name, e.g. `Europe/Paris`. Asked when null. |
+| `notifications` | `none` | `none`, `push`, `email` or `push+email`, when a run finishes. |
 
-## `defaults`
-Per-category defaults, used when a subsection does not set the value.
-| Field | Meaning |
-|---|---|
-| `count_method` | `on_theme`: count the papers of the period judged on the subsection's theme. `categories`: count all new papers in the subsection's arXiv categories. |
-| `category_N.n_papers` | Number of papers summarized in the subsection. |
-| `category_N.rank_by` | `relevance` (fit to the theme) or `impact` (strongest result of the period). |
-| `category_N.count` | Show the number of papers released in the period. |
+## `selection`
+| Field | Default | Meaning |
+|---|---|---|
+| `title_screen_above` | `120` | Pools larger than this are screened on titles before reading abstracts. |
 
-Defaults: category 1 → 3 papers, by relevance, counted. Category 2 → 1 paper, by impact, counted. Category 3 → 3 papers, by impact, not counted.
+## `full_text` (category 1)
+| Field | Default | Meaning |
+|---|---|---|
+| `source` | `alphaxiv` | `alphaxiv`: full text from the alphaXiv connector (arXiv papers). `abstract`: abstract only. `html`: planned, not available yet. |
+| `sections` | `[abstract, methods, results, conclusions]` | Sections kept, among `abstract`, `introduction`, `methods`, `results`, `discussion`, `conclusions`. |
+
+## `defaults` (per category; any subsection can override)
+| Field | Cat. 1 | Cat. 2 | Cat. 3 | Meaning |
+|---|---|---|---|---|
+| `n_papers` | 3 | 1 | 3 | Papers summarized. |
+| `rank_by` | `relevance` | `impact` | `impact` | Fit to the theme, or strength of the result. |
+| `count` | `true` | `true` | `false` | Show the number of papers of the period on the theme. |
+| `list_others` | `true` | — | — | List the other new papers on the theme. |
+| `one_per_field` | — | — | `true` | At most one paper per field. |
+| `exclude_fields` | — | — | `[]` | Fields to skip (tags below). |
 
 ## `sections`
-A list. Each section has a `title` and a list of `subsections`.
-Sections and subsections are numbered in order (1, 1.1, 1.2, 2, 2.1…).
+A list of sections, each with a `title` and `subsections`. Numbered in order (1, 1.1, ...).
 
-### Subsection fields
-| Field | Required | Meaning |
+| Subsection field | Required | Meaning |
 |---|---|---|
-| `theme` | yes | Subject of the subsection, in a few words. |
-| `category` | yes | Summary level: `1`, `2` or `3` (see below). |
-| `description` | no | One or two sentences on what counts as relevant. Used for selection. |
-| `keywords` | no | Terms that help find and judge papers. |
-| `sources.arxiv` | no | arXiv categories to search, e.g. `[astro-ph.GA]`. |
-| `sources.journals` | no | Journals to search. |
-| `sources.news` | no | News outlets used to find major results. |
-| `n_papers`, `rank_by`, `count` | no | Override the category defaults. |
+| `theme` | yes | Theme name: a `theme-<name>` skill of the plugin. |
+| `category` | yes | Summary level: 1, 2 or 3. |
+| `title` | no | Heading; default: the theme's title. |
+| `n_papers`, `rank_by`, `count`, `list_others`, `one_per_field`, `exclude_fields` | no | Override the category defaults. |
+| `full_text` | no | Overrides `full_text` (category 1). |
 | `skills.extract` | no | Theme skill extending `extract-paper`. |
 | `skills.summarize` | no | Theme skill extending `summarize-category-<category>`. |
 
-### Summary categories
-| Category | Purpose | Summary |
+## Summary categories
+| Category | For | Summary |
 |---|---|---|
-| 1 | Specific research | Bullets: Context, Aims, Methods, Results, Conclusions. |
-| 2 | Opening on the same field | At most 10 sentences, mostly context, methods and conclusions, with the field's vocabulary. |
-| 3 | Opening on other fields | At most 10 sentences, understandable by a high-school science student. |
+| 1 | Specific research | Bullets: Context, Aims, Methods, Results, Conclusions. Full text read. Other new papers listed. |
+| 2 | Opening on the same field | At most 10 sentences, mostly context, methods and conclusions, in the field's vocabulary. |
+| 3 | Opening on other fields | At most 10 sentences, for a high-school science student. Field tag and news link. |
 
-Each category can be used by any number of subsections.
-
-## Default structure
-1. **Main theme**
-   1. specific research topic — category 1
-   2. sub-domain of the field — category 2
-2. **Next door**: several close fields — category 2 each
-3. **Science at large**: main results of the period, any field — category 3
+## Field tags (category 3)
+Astronomy & astrophysics · Physics · Chemistry & materials · Biology · Medicine & health ·
+Earth & environment · Mathematics & computing · Engineering & technology ·
+Social & behavioural sciences

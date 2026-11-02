@@ -2,99 +2,84 @@
 
 *Hear ye! The latest papers in your research, your field, and science at large.*
 
-A Claude plugin that writes a literature digest over a tunable period (one week by default, or a month, or any other length).
-You choose the sections, their themes and how deeply each one is summarized.
-It is designed to run as a Claude scheduled task.
+A Claude plugin that writes a literature digest over a tunable period: one week by default,
+or a day, two weeks, a month. You choose the sections, their themes, and how deeply each
+one is summarized. It runs as a Claude scheduled task.
 
-> **Status:** skeleton. The structure, configuration and interfaces are in place. The detailed instructions of each step are marked `TODO`.
+## The digest
+Sections hold subsections. Each subsection has one **theme** and one **summary category**:
 
-## The output
-Sections contain subsections. Each subsection has one theme and one summary category.
-
-| Category | Purpose | Summary |
+| Category | For | Summary |
 |---|---|---|
-| 1 | Specific research | Bullets: Context, Aims, Methods, Results, Conclusions |
-| 2 | Opening on the same field | Max 10 sentences, field vocabulary, the strongest result of the period |
-| 3 | Opening on other fields | Max 10 sentences, readable by a high-school science student |
+| 1 | Specific research | The 3 best-fitting papers in bullets (Context, Aims, Methods, Results, Conclusions), from their full text; then the list of all other new papers on the theme |
+| 2 | Opening on the same field | The strongest result of the period, at most 10 sentences in the field's vocabulary |
+| 3 | Opening on other fields | Major results in any field, at most 10 sentences for a high-school science student, with a news link |
 
-Default structure:
-1. **Your main theme**
-   1. your specific research topic — category 1
-   2. a sub-domain of your field — category 2
-2. **Next door**: several close fields — category 2 each
-3. **Science at large**: main results of the period, any field — category 3
+Categories 1 and 2 also give the number of papers released on their theme during the period.
+A paper appears only once per digest.
 
-Category 1 and 2 subsections also show the number of papers released on their theme during the period.
+Default structure: (1) your main theme, a category-1 and a category-2 subsection;
+(2) "Next door", several close fields in category 2; (3) "Science at large", category 3.
 
-## The pipeline
-| Step | Skill |
+## Accuracy
+Summaries come only from the papers' own text. Nothing is invented: what a paper does not
+state is written **unknown**. Before delivery, a check verifies that every number of every
+summary appears in the paper, that no other work is cited, and that every link comes from
+the data. Rules: [`accuracy.md`](plugins/town-crier/skills/cry/reference/accuracy.md).
+
+## How it works
+```
+GitHub Action, daily                         Claude, each digest
+arXiv · bioRxiv/medRxiv · OpenAlex  ──►  data branch  ──►  1 load ─► 2 select ─► 3 extract ─► summarize ─► 4 assemble ─► check
+```
+1. **Look for papers.** A daily GitHub Action stores every new paper once, under the day it
+   appeared, for the databases your themes declare. Each subsection keeps the period's papers
+   that pass its theme's filters (categories, keywords, authors).
+2. **Select.** Claude judges each candidate against the theme (fit, or impact of the result),
+   then a script picks the papers, removes duplicates and counts papers per theme.
+3. **Extract and summarize.** Category 1 reads the full text through the alphaXiv connector,
+   keeping only the needed sections to save tokens. Theme skills can add rules to the base
+   extraction and summary skills.
+4. **Assemble and check.** Titles, links, authors, counts and lists come from the data;
+   Claude writes only the summaries.
+
+Details: [`pipeline.md`](plugins/town-crier/skills/cry/reference/pipeline.md).
+
+## Skills
+| Skill | Role |
 |---|---|
-| Entry point | `cry` |
-| 1. Look for papers in the period | `fetch-papers` |
-| 2. Select by fit or impact, count per subsection | `select-papers` |
-| 3a. Extract paper information | `extract-paper` (+ optional theme skill) |
-| 3b. Summarize at the subsection's category | `summarize-category-1/2/3` (+ optional theme skill) |
-| 4. Assemble the output file | `assemble-digest` |
-| Set up the configuration | `configure` |
-| Deploy as a scheduled task | `schedule-cry` |
+| `cry` | Entry point: runs the whole pipeline |
+| `fetch-papers` | Step 1: candidates of the period (with a search fallback) |
+| `select-papers` | Step 2: judgments, scores |
+| `extract-paper` | Step 3a, base skill |
+| `summarize-category-1`, `-2`, `-3` | Step 3b, base skills |
+| `assemble-digest` | Step 4: assembly and checks |
+| `theme-*` | Theme definitions: what to look for, how to judge |
+| `define-theme` | Create and test a theme |
+| `configure` | Build your configuration |
+| `schedule-cry` | Deploy as a scheduled task |
+| `extract-paper-cosmology`, `summarize-category-2-cosmology` | Example theme skills |
 
-Data passed between steps: [`skills/cry/reference/pipeline.md`](plugins/town-crier/skills/cry/reference/pipeline.md).
+## Get started
+See the [setup guide](docs/setup.md): enable the daily fetch, install the plugin, connect
+alphaXiv, configure, schedule. To add themes or theme skills, see [extending](docs/extending.md).
 
-## Install
-**claude.ai or Claude Desktop** (paid plans): Customize → Plugins → Personal plugins → **+** → *Add marketplace* → *Add from a repository* → `https://github.com/MatthieuPE/Town_Crier_Claude`. Then install **town-crier**.
-
-**Claude Code:**
+## Repository
 ```
-/plugin marketplace add MatthieuPE/Town_Crier_Claude
-/plugin install town-crier@town-crier
+.claude-plugin/marketplace.json      marketplace catalog
+.github/workflows/fetch-papers.yml   daily fetch
+pipeline/                            daily fetch code and settings
+configs/                             one configuration per user
+plugins/town-crier/                  the plugin: skills, themes, run scripts (cry/scripts)
+templates/                           templates of theme skills
+docs/                                setup and extension guides
+tests/                               test suite (pytest)
 ```
-
-## Use
-1. **Configure.** Ask Claude: *"Set up my Town Crier."* It writes your `town-crier.yaml`.
-   Or copy [`default.yaml`](plugins/town-crier/skills/cry/config/default.yaml) and edit it.
-   Field reference: [`schema.md`](plugins/town-crier/skills/cry/config/schema.md).
-   Example: [`galactic-archaeology.yaml`](plugins/town-crier/skills/cry/config/examples/galactic-archaeology.yaml).
-2. **Run once.** Ask Claude: *"Run the Town Crier with this configuration"*, and attach or paste it.
-3. **Schedule.** Ask Claude: *"Schedule my Town Crier."* It creates a scheduled task with your configuration inline.
-
-## Extend
-Add theme skills (e.g. for cosmology papers) that inherit from the base extraction and summary skills.
-See [`docs/extending.md`](docs/extending.md).
-
-## Repository structure
-```
-.claude-plugin/marketplace.json              marketplace catalog
-plugins/town-crier/
-├── .claude-plugin/plugin.json               plugin manifest
-└── skills/
-    ├── cry/                                 entry point
-    │   ├── config/default.yaml              default configuration
-    │   ├── config/schema.md                 configuration reference
-    │   ├── config/examples/                 example configurations
-    │   └── reference/pipeline.md            data contract between steps
-    ├── configure/                           build a configuration
-    ├── schedule-cry/                        deploy as a scheduled task
-    ├── fetch-papers/                        step 1
-    ├── select-papers/                       step 2
-    ├── extract-paper/                       step 3a (base)
-    ├── summarize-category-1/                step 3b (base)
-    ├── summarize-category-2/                step 3b (base)
-    ├── summarize-category-3/                step 3b (base)
-    ├── assemble-digest/                     step 4 + output template
-    ├── extract-paper-cosmology/             example theme skill
-    └── summarize-category-2-cosmology/      example theme skill
-templates/                                   templates for new theme skills
-docs/extending.md                            how to add a theme skill
-```
-
-## Collaborating
-- Change skills and defaults through pull requests.
-- Bump `version` in `plugin.json` when a skill changes, then refresh the plugin.
-- Personal configurations do not need to be in the repository.
 
 ## Caveats
 - Summaries are generated by Claude. Check the paper before citing it.
-- The arXiv API has [terms of use](https://info.arxiv.org/help/api/tou.html).
+- The arXiv, bioRxiv and OpenAlex APIs have terms of use; the fetch follows their rate guidance.
+- Full texts are read through alphaXiv and never stored in the repository.
 
 ## License
 MIT. See [LICENSE](LICENSE).

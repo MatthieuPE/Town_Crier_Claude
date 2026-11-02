@@ -1,0 +1,21 @@
+# Theme definition: read by the daily fetch (databases) and by the run (keywords).
+name: THEME                 # lowercase words with hyphens; equals the folder name without "theme-"
+title: Theme title
+description: >-
+  One or two sentences on the science this theme targets.
+databases:                  # at least one database
+  arxiv: []                 # e.g. [astro-ph.GA, astro-ph.SR]
+  # biorxiv: [all]          # or subject categories, e.g. [neuroscience]
+  # medrxiv: [all]
+  # openalex:
+  #   journals:
+  #     - {name: Nature, issn: [0028-0836, 1476-4687]}
+keywords:
+  any: []                   # at least one must match (title or abstract); empty = keep all
+  all: []                   # all must match
+  exclude: []               # none may match
+authors: []                 # names or collaborations always kept
+examples: []                # arXiv ids of typical papers, written "arXiv:YYMM.NNNNN"
+skills:                     # optional theme skills used by default for this theme
+  extract: null             # e.g. extract-paper-THEME
+  summarize: {1: null, 2: null, 3: null}   # e.g. {2: summarize-category-2-THEME}

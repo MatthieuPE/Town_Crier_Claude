@@ -1,0 +1,28 @@
+---
+name: theme-THEME
+description: Theme definition for the Town Crier digest - THEME TITLE. Loaded by the Town Crier pipeline to judge whether a paper fits this theme; not for general questions.
+---
+
+# Theme: THEME TITLE
+
+`theme.yaml` (same folder) holds the databases and keywords of stage 1.
+This text guides stage 2.
+
+## Targeted science
+Two or three sentences.
+
+## On theme
+- ...
+
+## Off theme
+- ...
+
+## Scoring (relevance)
+- 3: the theme is the main subject.
+- 2: the theme is a substantial part of the paper.
+- 1: the theme is context or an application only.
+
+## Scoring (impact)
+- 3: first detection, data release, or a result that changes the accepted picture.
+- 2: solid new result with clear consequences.
+- 1: incremental.

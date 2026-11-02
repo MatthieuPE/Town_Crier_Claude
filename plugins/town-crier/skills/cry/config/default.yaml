@@ -1,38 +1,56 @@
-# Town Crier — default configuration
+# Town Crier — default configuration.
 #
-# Copy this file, edit it, and give it to Claude with your request,
-# or let the `configure` skill write it with you.
+# Your own configuration only needs the values that differ from this file.
+# A `sections` list in your configuration replaces this one entirely.
 # Values in <angle brackets> must be filled in before a run.
-# Field reference: schema.md (same folder).
+# Field reference: schema.md (same folder). Example: configs/ at the repository root.
 
 version: 1
 
-# Covered period. Default: the last week.
+# Where the daily fetch stores papers (GitHub Action, branch `data`).
+data:
+  repository: MatthieuPE/Town_Crier_Claude
+  branch: data
+
+# Covered period. Default: the 7 days ending yesterday.
 period:
-  length: 1            # number of units covered
-  unit: week           # day | week | month
-  end: today           # last day covered: "today" or YYYY-MM-DD
+  length: 1             # number of units
+  unit: week            # day | week | month
+  end: yesterday        # yesterday | today | YYYY-MM-DD (rolling anchor only)
+  anchor: rolling       # rolling: `length` units ending on `end`
+                        # calendar: aligned windows (Mon–Sun weeks, half-months, months); set by scheduled tasks
 
 output:
-  title: "The Town Crier"
-  language: English
+  title: The Town Crier
+  language: English     # English, French and Italian have built-in headings
   filename: "town-crier_{start}_{end}.md"
-  delivery: file       # TODO: file | artifact
+  delivery: file        # Markdown file sent in the conversation
+  contents: true        # table of contents under the header
 
-# Used only by the `schedule-cry` skill.
+# Used only by the schedule-cry skill.
 schedule:
-  weekday: monday      # when period.unit is week
-  day_of_month: 1      # when period.unit is month
-  time: "08:00"        # local time
-  timezone: null       # IANA name, e.g. Europe/Paris. Asked when null.
+  weekday: monday       # weekly digests
+  day_of_month: 1       # monthly digests
+  time: "08:00"         # local time
+  timezone: null        # IANA name, e.g. Europe/Paris; asked when null
+  notifications: none   # none | push | email | push+email
 
-# Per-category defaults. Any subsection can override them.
+# Review of candidates.
+selection:
+  title_screen_above: 120   # bigger pools are screened on titles first
+
+# Full text, read for category 1 papers only.
+full_text:
+  source: alphaxiv          # alphaxiv | abstract  (html: planned)
+  sections: [abstract, methods, results, conclusions]
+
+# Per-category defaults; any subsection can override them.
 defaults:
-  count_method: on_theme   # on_theme | categories (see schema.md)
   category_1:
-    n_papers: 3
-    rank_by: relevance     # relevance (fit to the theme) | impact
-    count: true            # show the number of papers released in the period
+    n_papers: 3             # papers summarized
+    rank_by: relevance      # relevance (fit to the theme) | impact
+    count: true             # show the number of papers of the period on the theme
+    list_others: true       # list the other new papers on the theme
   category_2:
     n_papers: 1
     rank_by: impact
@@ -41,54 +59,30 @@ defaults:
     n_papers: 3
     rank_by: impact
     count: false
+    one_per_field: true     # at most one paper per field
+    exclude_fields: []      # e.g. ["Astronomy & astrophysics"]; tags in schema.md
 
 # Output structure: sections > subsections.
-# Each subsection has one theme and one summary category (1, 2 or 3).
+# Each subsection uses one theme (a theme-<name> skill) and one summary category.
 sections:
 
-  # Section 1 — your main theme.
-  - title: "<MAIN THEME>"
+  - title: "<SECTION 1 TITLE>"
     subsections:
-      - theme: "<SPECIFIC RESEARCH TOPIC>"
-        description: "<one or two sentences: what counts as relevant>"
-        keywords: []
-        sources:
-          arxiv: []          # e.g. [astro-ph.GA]
+      - theme: "<THEME A>"      # e.g. stellar-streams
         category: 1
-        skills:
-          extract: null      # optional theme skill, e.g. extract-paper-<theme>
-          summarize: null    # optional theme skill, e.g. summarize-category-1-<theme>
-      - theme: "<SUB-DOMAIN OF YOUR FIELD>"
-        description: "<one or two sentences>"
-        keywords: []
-        sources:
-          arxiv: []
+      - theme: "<THEME B>"
         category: 2
-        skills:
-          extract: null
-          summarize: null
 
-  # Section 2 — close fields, not directly related to yours.
-  - title: "Next door"
+  - title: Next door
     subsections:
       - theme: "<CLOSE FIELD 1>"
-        sources:
-          arxiv: []
         category: 2
       - theme: "<CLOSE FIELD 2>"
-        sources:
-          arxiv: []
         category: 2
       - theme: "<CLOSE FIELD 3>"
-        sources:
-          arxiv: []
         category: 2
 
-  # Section 3 — main scientific news of the period, any field.
-  - title: "Science at large"
+  - title: Science at large
     subsections:
-      - theme: "Major scientific results in any field"
-        sources:
-          journals: [Nature, Science, Cell, PNAS, Physical Review Letters, The New England Journal of Medicine]
-          news: [Nature News, Science news, Quanta Magazine]
+      - theme: science-at-large
         category: 3

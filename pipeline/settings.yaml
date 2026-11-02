@@ -1,0 +1,25 @@
+# Settings of the daily fetch (GitHub Action).
+# Which databases and categories to fetch comes from the theme definitions:
+# plugins/town-crier/skills/theme-*/theme.yaml
+
+retention_days: 100        # days of papers kept in the data branch
+
+lookback_days:             # each run re-queries this window; papers are stored once
+  arxiv: 14                # covers papers announced late (moderation holds)
+  biorxiv: 3
+  medrxiv: 3
+  openalex: 21             # journals are indexed with some delay
+
+arxiv:
+  page_size: 500           # results per request (API maximum 2000)
+  delay_seconds: 3         # arXiv asks for 3 s between requests
+
+biorxiv:
+  delay_seconds: 1
+
+openalex:
+  per_page: 100            # API maximum
+  delay_seconds: 1
+  max_pages: 50
+
+themes_glob: "plugins/town-crier/skills/theme-*/theme.yaml"

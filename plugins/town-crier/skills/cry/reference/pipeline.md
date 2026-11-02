@@ -1,88 +1,78 @@
-# Pipeline contract
+# Pipeline reference
 
-How the steps pass data to each other, and how theme skills extend base skills.
-
-## Steps
-| Step | Skill | Reads | Writes |
-|---|---|---|---|
-| 0. Resolve config | `cry` | user config, `config/default.yaml` | `config.resolved.yaml` |
-| 1. Look for papers | `fetch-papers` | `config.resolved.yaml` | `candidates.jsonl` |
-| 2. Select and count | `select-papers` | `candidates.jsonl`, config | `selection.json` |
-| 3a. Extract | `extract-paper` or theme skill | `selection.json`, candidates | `extracted/<paper_id>.json` |
-| 3b. Summarize | `summarize-category-<N>` or theme skill | `extracted/` | `summaries/<subsection_id>.md` |
-| 4. Assemble | `assemble-digest` | `summaries/`, `selection.json`, config | output file |
-
-## Run folder
+## Overview
 ```
-town-crier-runs/<start>_<end>/
-├── config.resolved.yaml
-├── candidates.jsonl
-├── selection.json
-├── extracted/<paper_id>.json
-├── summaries/<subsection_id>.md
-└── <output.filename>
-```
-`<paper_id>` in file names: replace `:` and `/` with `_`.
-
-## Records
-
-### `config.resolved.yaml`
-The merged configuration, with every default filled in, plus:
-```yaml
-period: {start: 2026-10-16, end: 2026-10-23, label: "this week"}
-# every section and subsection carries its id: "1", "1.1", …
+GitHub Action (daily)          Claude run (per digest)
+──────────────────────         ──────────────────────────────────────────────
+arXiv, bioRxiv/medRxiv,  ──►   data branch ──► load ──► select ──► extract ──► summarize ──► assemble ──► check
+OpenAlex  ──► data branch                     (stage 1)  (stage 2)  (alphaXiv for
+                                                                    category 1)
 ```
 
-### `candidates.jsonl` — one paper per line
-```json
-{"paper_id": "arXiv:2610.01234", "title": "…", "authors": ["…"], "abstract": "…",
- "url": "https://arxiv.org/abs/2610.01234", "doi": null, "source": "arxiv",
- "categories": ["astro-ph.GA"], "date": "2026-10-20", "found_for": ["1.1", "2.2"]}
+## Data branch (written by the Action)
 ```
-- `paper_id`: `arXiv:<id>`, else `doi:<DOI>`.
-- `date`: first release date (arXiv v1 or journal publication date).
-- `found_for`: subsections whose sources returned the paper.
-
-### `selection.json`
-```json
-{"period": {"start": "2026-10-16", "end": "2026-10-23", "label": "this week"},
- "subsections": {
-   "1.1": {"count": 14, "count_method": "on_theme",
-           "papers": [{"paper_id": "arXiv:2610.01234", "rank": 1, "reason": "…"}]}
- }}
+index.json                    databases, files, run days, coverage per scope, compiled themes
+last_run.json                 papers added and errors of the last fetch
+<database>/<YYYY-MM-DD>.jsonl papers first seen that day
 ```
-`count` is `null` when the subsection's `count` is false.
+Each paper is stored once, under the day the daily fetch first saw it (about its arXiv
+announcement day). Consecutive digests therefore never miss or repeat a paper.
+Databases: `arxiv`, `biorxiv`, `medrxiv`, `openalex`. What is fetched is the union of
+the `databases` declared by all theme definitions.
 
-### `extracted/<paper_id>.json`
-```json
-{"paper_id": "…", "title": "…", "url": "…", "read": "abstract | full_text",
- "fields": {"context": "…", "aims": "…", "methods": "…", "results": "…",
-            "conclusions": "…", "key_numbers": ["…"]},
- "theme_fields": {}}
-```
-`theme_fields` holds what a theme extraction skill adds.
+## Run folder (written by `tc.py`)
+| File | Written by | Content |
+|---|---|---|
+| `config.resolved.yaml` | `resolve` | Merged configuration, period, numbered subsections, themes used |
+| `candidates.jsonl` | `load` / `import` | Papers of the period that passed stage 1, with `found_for` |
+| `pools.json` | `load` / `import` | Subsection id -> candidate ids |
+| `judgments/<id>.json` | `judge` | Claude's stage-2 judgments |
+| `selection.json` | `finalize` | Counts, summarized papers, category-1 lists |
+| `fulltext/<paper>.txt` | `cut` | Kept sections of a full text |
+| `extracted/<paper>.json` | Claude | Extracted information (extract-paper) |
+| `summaries/<id>.md` | Claude | Summary bodies, one block per paper |
+| `news.json` | `news` | News links of category-3 papers |
+| `verified.json` | `verify` | Quotes for numbers written differently in the paper |
+| `notes.json` | `note`, `load` | Notes shown at the top of the digest |
+| `fallback.json` | `import` | Subsections filled by search (counts unknown) |
+| `<output.filename>` | `assemble` | The digest |
 
-### `summaries/<subsection_id>.md`
-The subsection's entries, in rank order, in its category's format.
-No subsection heading: `assemble-digest` adds it.
+`<paper>` is the paper id with `:` and `/` replaced by `_`.
 
-## Rules across steps
-- A paper appears at most once in the output. Subsections are served in reading order; a paper kept by an earlier subsection is skipped by later ones.
-- Only papers dated inside the period are kept.
-- Never invent a paper, an author, a link or a result. If a step fails, the output says what is missing.
+## Two-stage selection
+1. **Stage 1 (script).** A paper enters a subsection's pool if it comes from the theme's
+   databases and categories, has none of its `exclude` keywords, and matches its keywords
+   (`any`, `all`) or one of its `authors`.
+2. **Stage 2 (Claude).** Claude reads the pool and judges each paper: on theme or not,
+   score 1-3, kind, and field (category 3).
+
+The count of a subsection is the number of papers judged on theme in stage 2.
+
+## Once per digest
+Summaries are served in reading order; a paper summarized once is skipped by later
+subsections. Category-1 lists then hold the remaining on-theme papers, minus every
+summarized paper and every paper listed earlier.
 
 ## Theme skills: inheritance
-A theme skill specializes a base skill for one theme.
-
-| Base skill | Theme skill name |
+| Base skill | Theme skill |
 |---|---|
 | `extract-paper` | `extract-paper-<theme>` |
 | `summarize-category-1` | `summarize-category-1-<theme>` |
 | `summarize-category-2` | `summarize-category-2-<theme>` |
 | `summarize-category-3` | `summarize-category-3-<theme>` |
 
-- The theme skill's body starts with a `## Extends` section naming its base skill.
-- To run it: load the base skill, then the theme skill. Apply both.
-- The theme skill may add fields and rules, or tighten them. It may not drop the base's required fields or exceed its length limit.
-- A subsection uses a theme skill only when its config names it under `skills:`.
-- A `summarize-category-N-<theme>` skill may only serve subsections of category N.
+- A theme skill starts with an `## Extends` section naming its base.
+- To apply it: load the base, then the theme skill; apply both.
+- It may add fields and rules, or tighten them. It may not drop the base's required fields
+  or exceed its length limit.
+- It is used when a subsection names it under `skills:`, or when its theme definition names
+  it under `skills:` (the subsection wins).
+- A `summarize-category-N-<theme>` skill serves category N subsections only.
+
+## Theme definitions
+A theme is a skill folder `theme-<name>/` with two files:
+- `theme.yaml`: databases, categories, keywords, authors, examples, default theme skills.
+  Read by the daily fetch and by `load`.
+- `SKILL.md`: the targeted science and how to score it. Read by Claude in stage 2.
+
+Create and test themes with the `define-theme` skill.

@@ -1,0 +1,21 @@
+# Theme definition: read by the daily fetch (databases) and by the run (keywords).
+# Draft keywords: review them with the define-theme skill.
+name: galactic-archaeology
+title: Galactic archaeology
+description: >-
+  Structure, assembly history, chemistry and dynamics of the Milky Way from
+  large stellar surveys: halo, discs and bulge, accreted populations and
+  merger history.
+databases:
+  arxiv: [astro-ph.GA, astro-ph.SR]
+keywords:
+  any: ["Milky Way", "Galactic halo", "stellar halo*", "Galactic disc*", "Galactic disk*",
+        "thick disc*", "thick disk*", "Galactic bulge", "Galactic archaeology",
+        "accretion history", "merger history", "Gaia-Enceladus", "Gaia-Sausage", "chemodynamic*"]
+  all: []
+  exclude: []
+authors: []
+examples: []
+skills:
+  extract: null
+  summarize: {1: null, 2: null, 3: null}

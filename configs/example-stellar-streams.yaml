@@ -1,0 +1,32 @@
+# Example configuration: a stellar-streams researcher.
+# Only values that differ from the default are given; `sections` replaces the default list.
+# Copy it to configs/<your name>.yaml and edit.
+
+period:
+  length: 1
+  unit: week
+
+schedule:
+  timezone: Europe/Paris
+
+sections:
+
+  - title: Stellar streams
+    subsections:
+      - theme: stellar-streams
+        category: 1
+      - theme: galactic-archaeology
+        category: 2
+
+  - title: Next door
+    subsections:
+      - theme: cosmology
+        category: 2
+      - theme: galaxy-formation
+        category: 2
+
+  - title: Science at large
+    subsections:
+      - theme: science-at-large
+        category: 3
+        exclude_fields: ["Astronomy & astrophysics"]

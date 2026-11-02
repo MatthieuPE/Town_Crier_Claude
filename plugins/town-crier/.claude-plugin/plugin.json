@@ -1,0 +1,10 @@
+{
+  "name": "town-crier",
+  "version": "0.1.0",
+  "description": "Configurable literature digest over a tunable period: new papers fetched daily, selected by fit or impact, summarized at three depth levels with accuracy checks, and assembled into your sections. Designed to run as a scheduled task.",
+  "author": {
+    "name": "Matthieu Pélissier"
+  },
+  "license": "MIT",
+  "keywords": ["literature-review", "digest", "arxiv", "astrophysics", "scheduled-task"]
+}
