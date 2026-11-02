@@ -68,6 +68,7 @@ alphaXiv, configure, schedule. To add themes or theme skills, see [extending](do
 ```
 .claude-plugin/marketplace.json      marketplace catalog
 .github/workflows/fetch-papers.yml   daily fetch
+.github/workflows/tests.yml          test suite on every pull request
 pipeline/                            daily fetch code and settings
 configs/                             one configuration per user
 plugins/town-crier/                  the plugin: skills, themes, run scripts (cry/scripts)

@@ -61,7 +61,8 @@ summarize skill for a category N subsection is `summarize-category-N` or starts 
 `summarize-category-N-`.
 
 ## 3. Tests
-The scripts have a test suite. From the repository root:
+The scripts have a test suite. The **Tests** workflow runs it on every pull request and
+push to `main`, on Python 3.10, 3.12 and 3.13. To run it locally, from the repository root:
 ```
 pip install pyyaml pytest
 python -m pytest            # everything

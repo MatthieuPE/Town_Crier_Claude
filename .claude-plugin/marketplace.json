@@ -1,0 +1,14 @@
+{
+  "name": "town-crier",
+  "description": "Periodic literature digests for researchers: your research, your field, and the main scientific results of the period.",
+  "owner": {
+    "name": "Matthieu Pélissier"
+  },
+  "plugins": [
+    {
+      "name": "town-crier",
+      "source": "./plugins/town-crier",
+      "description": "Hear ye! A configurable digest of new papers in your research, your field and science at large, over a week, a month or any period."
+    }
+  ]
+}

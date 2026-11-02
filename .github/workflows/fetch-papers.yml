@@ -1,0 +1,98 @@
+# Daily fetch of new papers for the Town Crier.
+# Writes one file per database and day to the `data` branch, which Claude
+# reads during each digest run. The branch is rewritten as a single commit
+# each day, so it never grows a history.
+
+name: Fetch papers
+
+on:
+  schedule:
+    - cron: "17 4 * * *"   # every day, 04:17 UTC (after arXiv's evening announcement)
+  workflow_dispatch:
+    inputs:
+      backfill_days:
+        description: "Look back N days and date papers by first version (0 = normal run)"
+        required: false
+        default: "0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-papers
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v5
+
+      - name: Look for the data branch
+        id: data
+        run: |
+          code=0
+          git ls-remote --exit-code --heads origin data > /dev/null || code=$?
+          if [ "$code" -eq 0 ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          elif [ "$code" -eq 2 ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No data branch yet: this run creates it."
+          else
+            echo "::error::Could not query the data branch (git exit $code). Stopping, so stored papers are not overwritten."
+            exit 1
+          fi
+
+      - name: Check out data branch
+        if: steps.data.outputs.exists == 'true'
+        uses: actions/checkout@v5
+        with:
+          ref: data
+          path: _data
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r pipeline/requirements.txt
+
+      - name: Fetch papers
+        working-directory: pipeline
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          BACKFILL_DAYS: ${{ inputs.backfill_days || '0' }}
+        run: >
+          python -m town_crier_fetch
+          --repo-root ..
+          --data-dir ../_data
+          --settings settings.yaml
+          --backfill-days "$BACKFILL_DAYS"
+
+      - name: Publish data branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd _data
+          rm -rf .git
+          git init -q -b data
+          git add -A
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "Papers up to $(date -u +%F)"
+          git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:data
+
+      - name: Report query errors
+        run: |
+          python - <<'EOF'
+          import json, sys
+          run = json.load(open("_data/last_run.json"))
+          print("papers added:", run["added"])
+          for err in run["errors"]:
+              print("::error::" + err)
+          sys.exit(1 if run["errors"] else 0)
+          EOF
