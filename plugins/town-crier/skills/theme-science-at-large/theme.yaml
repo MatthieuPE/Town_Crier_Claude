@@ -19,6 +19,7 @@ keywords:
   any: []
   all: []
   exclude: []
+  exclude_titles: ["In Science Journals", "In Other Journals"]   # Science's weekly digest pages
 authors: []
 examples: []
 skills:

@@ -37,7 +37,7 @@ schedule:
 
 # Review of candidates.
 selection:
-  title_screen_above: 120   # bigger pools are screened on titles first
+  title_screen_above: 40    # bigger pools are screened on titles first (saves tokens)
 
 # Full text, read for category 1 papers only.
 full_text:

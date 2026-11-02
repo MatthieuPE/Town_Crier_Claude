@@ -40,7 +40,7 @@ Check a configuration with `tc.py resolve --config <file> --dry-run`.
 ## `selection`
 | Field | Default | Meaning |
 |---|---|---|
-| `title_screen_above` | `120` | Pools larger than this are screened on titles before reading abstracts. |
+| `title_screen_above` | `40` | Pools larger than this are screened on titles before reading abstracts. Lower = fewer tokens; abstracts are always read before a paper can be summarized. |
 
 ## `full_text` (category 1)
 | Field | Default | Meaning |
@@ -76,7 +76,7 @@ A list of sections, each with a `title` and `subsections`. Numbered in order (1,
 |---|---|---|
 | 1 | Specific research | Bullets: Context, Aims, Methods, Results, Conclusions. Full text read. Other new papers listed. |
 | 2 | Opening on the same field | At most 10 sentences, mostly context, methods and conclusions, in the field's vocabulary. |
-| 3 | Opening on other fields | At most 10 sentences, for a high-school science student. Field tag and news link. |
+| 3 | Opening on other fields | At most 10 sentences, for a high-school science student. Field tag and news link. Research papers only. |
 
 ## Field tags (category 3)
 Astronomy & astrophysics · Physics · Chemistry & materials · Biology · Medicine & health ·

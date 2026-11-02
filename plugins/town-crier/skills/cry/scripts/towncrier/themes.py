@@ -110,7 +110,7 @@ def validate(theme, name=None):
         if not ISSN_RE.match(issn):
             errors.append(f"databases.openalex: '{issn}' is not an ISSN (NNNN-NNNN)")
     keywords = theme.get("keywords") or {}
-    for key in ("any", "all", "exclude"):
+    for key in ("any", "all", "exclude", "exclude_titles"):
         value = keywords.get(key) or []
         if not isinstance(value, list) or not all(isinstance(v, str) and v.strip() for v in value):
             errors.append(f"keywords.{key}: list of non-empty strings")

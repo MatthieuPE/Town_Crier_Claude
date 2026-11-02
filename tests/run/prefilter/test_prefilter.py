@@ -2,6 +2,7 @@
 
 import pytest
 
+from towncrier import config, themes
 from towncrier.prefilter import ThemeFilter, compile_keyword, normalize
 
 
@@ -46,3 +47,34 @@ def test_theme_filter(theme):
     assert not f.passes(rec("Stellar streams and cold streams"))                    # excluded
     assert f.passes(rec("Dynamics of the halo", authors=("Ana Bonaca",)))           # author
     assert not f.passes(rec("Dynamics of the halo"))
+
+
+def journal(title, abstract="We report a new result."):
+    """Minimal OpenAlex record from Science."""
+    return {"source": "openalex", "title": title, "abstract": abstract, "issn": ["0036-8075"], "authors": []}
+
+
+@pytest.mark.run
+@pytest.mark.prefilter
+@pytest.mark.unit
+def test_exclude_titles_whole_or_prefix():
+    """Whole titles are dropped; a trailing * drops titles that start so; abstracts are not searched."""
+    f = ThemeFilter.from_theme({"databases": {"openalex": ["0036-8075"]},
+                                "keywords": {"exclude_titles": ["In Science Journals", "Profile of*"]}})
+    assert not f.passes(journal("In Science Journals"))
+    assert not f.passes(journal("in science journals"))
+    assert not f.passes(journal("Profile of Jane Doe"))
+    assert f.passes(journal("Publication bias in science journals"))              # not the whole title
+    assert f.passes(journal("A new result", abstract="Gender gaps in science journals."))
+
+
+@pytest.mark.run
+@pytest.mark.prefilter
+@pytest.mark.unit
+def test_science_at_large_drops_digest_pages():
+    """The shipped theme removes Science's weekly digest pages and keeps research."""
+    theme = themes.load_local(config.SKILLS_DIR)["science-at-large"]
+    f = ThemeFilter.from_theme(theme)
+    assert not f.passes(journal("In Science Journals"))
+    assert not f.passes(journal("In Other Journals"))
+    assert f.passes(journal("A room-temperature superconductor"))

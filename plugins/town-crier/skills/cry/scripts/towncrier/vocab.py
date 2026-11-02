@@ -16,9 +16,10 @@ FIELDS = (
 # kinds of paper, judged by Claude
 KINDS = ("research", "review", "proceedings", "erratum", "other")
 
-# kinds allowed in summaries, per category (lists of category 1 keep all)
+# kinds allowed in summaries, per category (lists of category 1 keep all);
+# "other" = data release, catalogue, instrument, software or white paper
 SUMMARY_KINDS = {1: {"research", "review", "proceedings", "other"}, 2: {"research", "other"},
-                 3: {"research", "other"}}
+                 3: {"research"}}
 
 # sections that can be read from full texts
 SECTIONS = ("abstract", "introduction", "methods", "results", "discussion", "conclusions")

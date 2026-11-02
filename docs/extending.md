@@ -21,7 +21,8 @@ Keyword syntax (title and abstract, case-insensitive):
 | `GD-1` | `GD-1`, `GD 1` (hyphens and slashes count as spaces) |
 
 `any`: at least one must match (empty: keep every paper of the categories). `all`: every
-one must match. `exclude`: none may match. `authors`: always kept.
+one must match. `exclude`: none may match. `exclude_titles`: whole titles to drop (a
+trailing `*` drops titles that start with it). `authors`: always kept.
 
 ## 2. Theme skills (extracting and summarizing)
 A theme skill specializes a base skill for one theme, e.g. cosmology. It adds rules; the

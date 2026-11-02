@@ -60,3 +60,12 @@ def test_parse_summaries():
     """Bodies are split on paper markers."""
     text = "<!-- paper: arXiv:1 -->\nBody one.\n\n<!-- paper: doi:10.1/x -->\nBody two.\n"
     assert assemble.parse_summaries(text) == {"arXiv:1": "Body one.", "doi:10.1/x": "Body two."}
+
+
+@pytest.mark.run
+@pytest.mark.assemble
+@pytest.mark.unit
+def test_titles_cannot_become_html():
+    """Angle brackets in titles are escaped; brackets cannot break the link."""
+    rec = {"title": "Field <B> in galaxies at 0.4<z<4 [new]"}
+    assert assemble.link_title(rec) == "Field &lt;B&gt; in galaxies at 0.4&lt;z&lt;4 (new)"

@@ -63,3 +63,11 @@ def test_plugin_themes_are_valid(plugin_themes):
     """Every theme shipped with the plugin passes validation."""
     for name, theme in plugin_themes.items():
         assert themes.validate(theme, name) == [], name
+
+
+@pytest.mark.run
+@pytest.mark.config
+@pytest.mark.unit
+def test_title_screening_default():
+    """Pools above 40 candidates are screened on titles first by default."""
+    assert config.load()["selection"]["title_screen_above"] == 40

@@ -50,7 +50,8 @@ def render(sub, recs, *, titles_only=False):
         Sheet text.
     """
     head = [f"# Subsection {sub['id']}: {sub['title']} (theme {sub['theme']}, category {sub['category']}, "
-            f"rank by {sub['rank_by']})", f"{len(recs)} candidates."]
+            f"rank by {sub['rank_by']})", f"{len(recs)} candidates.",
+            "Not a paper (news, editorial, commentary, perspective, profile, digest page): always n."]
     if sub["category"] == 3:
         head.append("Field tags: " + " | ".join(vocab.FIELDS))
     lines = head + [""]
