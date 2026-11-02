@@ -1,13 +1,11 @@
 # Configurations
 
-One file per user: `configs/<name>.yaml`. Scheduled runs read it from the `main` branch
-at each run, so editing and pushing it changes the next digest; no new scheduled task is
-needed.
+Users do **not** need a file here: `tcc-init` stores each user's configuration in their own
+scheduled task. The files below are reference examples only.
 
 - Full example with its own themes: [`stream_digest.yaml`](stream_digest.yaml).
 - Start from [`example-stellar-streams.yaml`](example-stellar-streams.yaml), or ask Claude
-  *"Set up my Town Crier"* (`configure` skill).
+  *"Set up my Town Crier"* (`tcc-init` skill).
 - Only write the values that differ from the
-  [default configuration](../plugins/town-crier/skills/cry/config/default.yaml).
-- Field reference: [`schema.md`](../plugins/town-crier/skills/cry/config/schema.md).
-- The repository is public: do not put anything private in these files.
+  [default configuration](../plugins/town-crier/skills/tcc-cry/config/default.yaml).
+- Field reference: [`schema.md`](../plugins/town-crier/skills/tcc-cry/config/schema.md).

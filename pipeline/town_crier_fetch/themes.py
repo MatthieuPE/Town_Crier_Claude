@@ -19,7 +19,7 @@ def find_theme_files(repo_root, pattern):
         Repository root.
     pattern : str
         Glob relative to the root, e.g.
-        ``plugins/town-crier/skills/theme-*/theme.yaml``.
+        ``plugins/town-crier/skills/tcc-theme-*/theme.yaml``.
 
     Returns
     -------
@@ -35,7 +35,7 @@ def load_theme(path):
     Parameters
     ----------
     path : str or Path
-        ``theme.yaml`` inside a ``theme-<name>`` folder.
+        ``theme.yaml`` inside a ``tcc-theme-<name>`` folder.
 
     Returns
     -------
@@ -49,9 +49,9 @@ def load_theme(path):
     """
     path = Path(path)
     theme = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    slug = path.parent.name.removeprefix("theme-")
+    slug = path.parent.name.removeprefix("tcc-theme-")
     if theme.get("name") != slug:
-        raise ValueError(f"{path}: name must be '{slug}' (folder theme-{slug})")
+        raise ValueError(f"{path}: name must be '{slug}' (folder tcc-theme-{slug})")
     dbs = theme.get("databases") or {}
     if not any(dbs.get(db) for db in DATABASES):
         raise ValueError(f"{path}: declare at least one database ({', '.join(DATABASES)})")

@@ -25,7 +25,7 @@ Default structure: (1) your main theme, a category-1 and a category-2 subsection
 Summaries come only from the papers' own text. Nothing is invented: what a paper does not
 state is written **unknown**. Before delivery, a check verifies that every number of every
 summary appears in the paper, that no other work is cited, and that every link comes from
-the data. Rules: [`accuracy.md`](plugins/town-crier/skills/cry/reference/accuracy.md).
+the data. Rules: [`accuracy.md`](plugins/town-crier/skills/tcc-cry/reference/accuracy.md).
 
 ## How it works
 ```
@@ -43,22 +43,23 @@ arXiv · bioRxiv/medRxiv · OpenAlex  ──►  data branch  ──►  1 load 
 4. **Assemble and check.** Titles, links, authors, counts and lists come from the data;
    Claude writes only the summaries.
 
-Details: [`pipeline.md`](plugins/town-crier/skills/cry/reference/pipeline.md).
+Details: [`pipeline.md`](plugins/town-crier/skills/tcc-cry/reference/pipeline.md).
 
 ## Skills
 | Skill | Role |
 |---|---|
-| `cry` | Entry point: runs the whole pipeline |
-| `fetch-papers` | Step 1: candidates of the period (with a search fallback) |
-| `select-papers` | Step 2: judgments, scores |
-| `extract-paper` | Step 3a, base skill |
-| `summarize-category-1`, `-2`, `-3` | Step 3b, base skills |
-| `assemble-digest` | Step 4: assembly and checks |
-| `theme-*` | Theme definitions: what to look for, how to judge |
-| `define-theme` | Create and test a theme |
-| `configure` | Build your configuration |
-| `schedule-cry` | Deploy as a scheduled task |
-| `extract-paper-cosmology`, `summarize-category-2-cosmology` | Example theme skills |
+| `tcc-init` | First setup: a few questions, stored in the scheduled task |
+| `tcc-cry` | Entry point: runs the whole pipeline |
+| `tcc-fetch-papers` | Step 1: candidates of the period (with a search fallback) |
+| `tcc-select-papers` | Step 2: judgments, scores |
+| `tcc-extract-paper` | Step 3a, base skill |
+| `tcc-summarize-category-1`, `-2`, `-3` | Step 3b, base skills |
+| `tcc-assemble-digest` | Step 4: assembly and checks |
+| `tcc-theme-*` | Theme definitions: what to look for, how to judge |
+| `tcc-define-theme` | Create and test a theme |
+| `tcc-configure` | Change your stored configuration by talking to Claude |
+| `tcc-schedule-cry` | Create or update the scheduled task that holds your configuration |
+| `tcc-extract-paper-cosmology`, `tcc-summarize-category-2-cosmology` | Example theme skills |
 
 ## Get started
 See the [setup guide](docs/setup.md): enable the daily fetch, install the plugin, connect

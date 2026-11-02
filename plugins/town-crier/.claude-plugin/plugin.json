@@ -1,6 +1,6 @@
 {
   "name": "town-crier",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Configurable literature digest over a tunable period: new papers fetched daily, selected by fit or impact, summarized at three depth levels with accuracy checks, and assembled into your sections. Designed to run as a scheduled task.",
   "author": {
     "name": "Matthieu Pélissier"

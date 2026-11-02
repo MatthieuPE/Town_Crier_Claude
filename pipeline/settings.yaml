@@ -1,6 +1,6 @@
 # Settings of the daily fetch (GitHub Action).
 # Which databases and categories to fetch comes from the theme definitions:
-# plugins/town-crier/skills/theme-*/theme.yaml
+# plugins/town-crier/skills/tcc-theme-*/theme.yaml
 
 retention_days: 100        # days of papers kept in the data branch
 
@@ -22,5 +22,5 @@ openalex:
   delay_seconds: 1
   max_pages: 50
 
-themes_glob: "plugins/town-crier/skills/theme-*/theme.yaml"
+themes_glob: "plugins/town-crier/skills/tcc-theme-*/theme.yaml"
 configs_glob: "configs/*.yaml"   # themes written in user configurations are fetched too

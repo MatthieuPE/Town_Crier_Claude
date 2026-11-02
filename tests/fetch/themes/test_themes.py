@@ -4,7 +4,7 @@ import pytest
 
 from town_crier_fetch import themes
 
-GLOB = "plugins/town-crier/skills/theme-*/theme.yaml"
+GLOB = "plugins/town-crier/skills/tcc-theme-*/theme.yaml"
 
 
 @pytest.mark.fetch
@@ -24,7 +24,7 @@ def test_plan_merges_themes(plugin_repo):
 @pytest.mark.unit
 def test_name_must_match_folder(tmp_path, theme_yaml):
     """A theme whose name differs from its folder is rejected."""
-    folder = tmp_path / "theme-right"
+    folder = tmp_path / "tcc-theme-right"
     folder.mkdir()
     (folder / "theme.yaml").write_text(theme_yaml("wrong", arxiv=["astro-ph.GA"]))
     defs, errors = themes.load_themes([folder / "theme.yaml"])

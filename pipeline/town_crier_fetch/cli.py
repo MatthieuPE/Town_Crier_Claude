@@ -19,7 +19,7 @@ DEFAULT_SETTINGS = {
     "arxiv": {"page_size": 500, "delay_seconds": 3.0},
     "biorxiv": {"delay_seconds": 1.0},
     "openalex": {"per_page": 100, "delay_seconds": 1.0, "max_pages": 50},
-    "themes_glob": "plugins/town-crier/skills/theme-*/theme.yaml",
+    "themes_glob": "plugins/town-crier/skills/tcc-theme-*/theme.yaml",
     "configs_glob": "configs/*.yaml",
 }
 

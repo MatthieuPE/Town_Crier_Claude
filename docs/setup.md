@@ -41,16 +41,17 @@ Category 1 reads full texts through the alphaXiv connector. Connect it, then set
 `get_paper_content` and `discover_papers` to **Always allow** (Customize → Connectors →
 alphaXiv → Tool permissions). Without it, category 1 is summarized from abstracts.
 
-## 6. Configure and schedule (each user)
-1. Ask Claude *"Set up my Town Crier"*. Commit the file it gives you to `configs/<name>.yaml`.
-2. Ask Claude *"Run the Town Crier with configs/<name>.yaml"* once, and read the digest.
-3. Ask Claude *"Schedule my Town Crier"*. Accept the one-off test run it offers, and check
-   its digest: the notes at the top say whether full texts were read and whether anything
+## 6. Set up and schedule (each user)
+1. Ask Claude *"Set up my Town Crier"* (`tcc-init`). Answer the questions; nothing to edit
+   or push. Your configuration is stored in the scheduled task Claude creates.
+2. Accept the first digest it offers, and read it.
+3. Accept the one-off test run it offers, and check the digest: the notes at the top say whether full texts were read and whether anything
    failed. If runs wait for approvals, switch the scheduled task to **Automatically approve**
    in its settings.
 
 ## Updating
-- **Configuration:** edit and push `configs/<name>.yaml`; the next run uses it.
+- **Configuration:** tell Claude what to change (`tcc-configure`); it updates the scheduled
+  task, and the next run uses it.
 - **Skills or themes:** push the change, bump `version` in
   `plugins/town-crier/.claude-plugin/plugin.json`, and refresh the plugin in Claude.
 - **New theme categories** are fetched from the next daily run. To backfill them at once,
