@@ -100,7 +100,8 @@ def resolve_subsection(sid, sub, cfg, theme):
     """
     cat = sub.get("category")
     out = {"id": sid, "theme": sub.get("theme"), "category": cat,
-           "title": sub.get("title") or (theme or {}).get("title") or sub.get("theme")}
+           "title": sub.get("title") or (theme or {}).get("title") or sub.get("theme"),
+           "guidance": sub.get("guidance")}
     defaults = (cfg.get("defaults") or {}).get(f"category_{cat}") or {}
     for key, value in defaults.items():
         out[key] = sub.get(key, value)

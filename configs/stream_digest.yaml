@@ -1,0 +1,159 @@
+# Stream digest: a complete example configuration.
+# Weekly digest for a researcher probing dark matter with stellar streams.
+# Themes are written here, in the `themes` block: no skill file is needed.
+# The daily GitHub Action fetches the categories they declare.
+
+period:
+  length: 1
+  unit: week                # a Sunday run covers Sunday to Saturday
+
+output:
+  title: The Stream Digest
+  language: English
+
+schedule:
+  weekday: sunday
+  time: "15:00"
+  timezone: Europe/Paris
+  notifications: none
+
+themes:
+
+  streams-dark-matter:
+    title: Stellar streams as dark matter probes
+    description: >-
+      Using stellar streams to constrain dark matter (subhalo impacts, gaps, spurs,
+      density and velocity fluctuations, dark matter models), and the stream dynamics
+      that can mimic or hide those signatures.
+    databases:
+      arxiv: [astro-ph.GA, astro-ph.CO]
+    keywords:
+      any: ["stellar stream*", "tidal stream*", "tidal tail*", "stream gap*", "stream spur*",
+            "stream perturbation*", "cold stream*", "GD-1", "Pal 5", "Palomar 5", "ATLAS-Aliqa Uma",
+            "Jhelum", "Phoenix stream", "Orphan stream", "Sagittarius stream", "tidal debris",
+            "tidal feature*"]
+      exclude: ["tidal disruption event*", "cold gas stream*", "cold flow*", "solar wind"]
+    examples: ["arXiv:2609.10897", "arXiv:2510.02247", "arXiv:2605.16200"]
+    guidance: |
+      On theme:
+      - Dark matter constraints or forecasts from streams: gaps, spurs, density power
+        spectra, velocity dispersion, subhalo impacts, dark matter models (WDM, FDM, SIDM, PBH).
+      - Stream dynamics that are astrophysical systematics for dark matter studies: the host
+        potential (disk, bar, spiral arms, LMC, halo shape, time evolution), giant molecular
+        clouds, progenitor properties, epicyclic overdensities, chaos, stream-modelling methods.
+      - Milky Way streams first; streams around external galaxies are on theme too.
+      Off theme: detection or survey papers with no dark matter or dynamics analysis (they
+      belong to the next theme); cold gas flows, tidal disruption events, solar wind.
+      Relevance: 3 = a dark matter constraint or forecast from streams, or a perturbation
+      systematic quantified for such studies; 2 = stream dynamics or modelling useful to
+      dark matter inference; 1 = streams are context only. Prefer Milky Way work at equal fit.
+
+  stream-observations:
+    title: Observing streams and survey systematics
+    description: >-
+      Detecting and characterising stellar streams and tidal features in photometric
+      surveys, the impact of observational systematics on these measurements, and major
+      advances against survey systematics (large-scale structure, star-galaxy separation).
+    databases:
+      arxiv: [astro-ph.GA, astro-ph.IM, astro-ph.CO]
+    keywords:
+      any: ["stellar stream*", "tidal stream*", "tidal tail*", "tidal feature*", "stellar halo*",
+            "low surface brightness", "matched filter*", "star-galaxy", "star/galaxy",
+            "star galaxy separation", "star galaxy classification", "selection function*",
+            "imaging systematic*", "observational systematic*", "survey systematic*",
+            "photometric systematic*", "survey property map*", "depth variation*",
+            "survey depth", "galactic extinction", "dust map*", "blending", "photometric calibration"]
+      exclude: ["tidal disruption event*", "cold gas stream*"]
+    examples: ["arXiv:2609.10897"]
+    guidance: |
+      On theme:
+      - Detection, mapping and characterisation of streams and tidal features with
+        photometric surveys (Gaia, DES, DELVE, Legacy Surveys, HSC, Rubin/LSST, Euclid, Roman),
+        in the Milky Way first, and around external galaxies.
+      - Studies of how observational systematics (depth variations, extinction, photometric
+        errors, star-galaxy separation, crowding, calibration, completeness) affect stream or
+        stellar-halo measurements.
+      - Major methods or data products that reduce survey systematics in large-scale
+        structure or star-galaxy separation.
+      Off theme: papers that only apply standard systematics corrections; cosmology results
+      whose main topic is not the systematics themselves.
+      Impact: 3 = a new survey, catalogue or method likely to change stream work, or a
+      quantified systematic with clear consequences; 2 = solid new detections or analysis;
+      1 = incremental.
+
+  cosmology-non-cmb:
+    title: Cosmology (non-CMB)
+    description: >-
+      Cosmology from large-scale structure, weak lensing, clusters, supernovae, BAO,
+      line-intensity mapping, gravitational waves and dark matter, excluding CMB studies.
+    databases:
+      arxiv: [astro-ph.CO]
+    guidance: |
+      On theme: any astro-ph.CO paper whose main subject is not the CMB.
+      Off theme: papers whose main subject is the CMB (they belong to the CMB theme);
+      papers that only use CMB data in a combination stay on theme.
+      Impact: 3 = new cosmological constraints from a major survey or data release, or a
+      result that changes a known tension; 2 = solid new measurement or method; 1 = incremental.
+
+  cmb:
+    title: Cosmic microwave background
+    description: >-
+      CMB temperature and polarisation, lensing, Sunyaev-Zel'dovich effects, spectral
+      distortions, foregrounds and experiments.
+    databases:
+      arxiv: [astro-ph.CO]
+    keywords:
+      any: ["CMB", "cosmic microwave background", "B-mode*", "E-mode*", "Sunyaev-Zel'dovich",
+            "Sunyaev-Zeldovich", "kSZ", "tSZ", "spectral distortion*", "Simons Observatory",
+            "LiteBIRD", "CMB-S4", "Atacama Cosmology Telescope", "South Pole Telescope"]
+    guidance: |
+      On theme: papers whose main subject is the CMB or its secondary anisotropies.
+      Off theme: papers that only use CMB data as one input to another analysis.
+      Impact: as for cosmology.
+
+  galaxy-dynamics:
+    title: Galaxy dynamics
+    description: >-
+      Dynamics of galaxies and of the Milky Way: potentials, orbits, bars and spirals,
+      resonances, disc heating, dark matter haloes from kinematics, N-body methods.
+    databases:
+      arxiv: [astro-ph.GA]
+    keywords:
+      any: ["galactic dynamics", "galaxy dynamics", "stellar dynamics", "dynamical model*",
+            "gravitational potential", "Galactic potential", "galactic bar", "bar pattern speed",
+            "spiral arm*", "resonance*", "action-angle", "actions", "phase space", "phase-space",
+            "orbit*", "rotation curve*", "Jeans", "dynamical friction", "disc heating",
+            "disk heating", "N-body", "halo shape", "dark matter halo*"]
+    guidance: |
+      On theme: papers whose main subject is the dynamics of galaxies or of the Milky Way.
+      Off theme: papers using kinematics only to classify objects; black hole accretion.
+      Impact: 3 = a new dynamical measurement of the Milky Way or galaxies with broad
+      consequences (potential, dark matter halo, bar), or a major method; 2 = solid
+      new result; 1 = incremental.
+
+sections:
+
+  - title: Stellar streams
+    subsections:
+      - theme: streams-dark-matter
+        category: 1
+      - theme: stream-observations
+        category: 2
+
+  - title: Next door
+    subsections:
+      - theme: cosmology-non-cmb
+        category: 2
+      - theme: cmb
+        category: 2
+      - theme: galaxy-dynamics
+        category: 2
+
+  - title: Science at large
+    subsections:
+      - theme: science-at-large
+        category: 3
+        guidance: >-
+          Astronomy and astrophysics are allowed but not a priority: keep an astrophysics
+          paper only for a major result outside stellar streams, cosmology, the CMB and galaxy
+          dynamics; otherwise prefer other fields.

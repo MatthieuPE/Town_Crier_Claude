@@ -69,3 +69,14 @@ def test_titles_cannot_become_html():
     """Angle brackets in titles are escaped; brackets cannot break the link."""
     rec = {"title": "Field <B> in galaxies at 0.4<z<4 [new]"}
     assert assemble.link_title(rec) == "Field &lt;B&gt; in galaxies at 0.4&lt;z&lt;4 (new)"
+
+
+@pytest.mark.run
+@pytest.mark.assemble
+@pytest.mark.unit
+def test_sheet_shows_theme_guidance():
+    """Review sheets start with the theme's description and guidance and the subsection's guidance."""
+    from towncrier import sheets
+    sub = {"id": "1.1", "title": "T", "theme": "t", "category": 2, "rank_by": "impact", "guidance": "Prefer X."}
+    text = sheets.render(sub, [], theme={"description": "Scope.", "guidance": "On theme: Y."})
+    assert "Theme: Scope." in text and "On theme: Y." in text and "Prefer X." in text

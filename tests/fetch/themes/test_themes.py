@@ -40,3 +40,13 @@ def test_biorxiv_all_collapses():
     defs = {"a": {"databases": {"biorxiv": ["Neuroscience"]}},
             "b": {"databases": {"biorxiv": ["all"]}}}
     assert themes.build_plan(defs) == {"biorxiv": ["all"]}
+
+
+@pytest.mark.fetch
+@pytest.mark.themes
+@pytest.mark.unit
+def test_configuration_themes_are_fetched(repo_root):
+    """Themes written in configs/*.yaml add their databases to the fetch plan."""
+    defs, errors = themes.load_config_themes(themes.find_theme_files(repo_root, "configs/*.yaml"))
+    assert not errors
+    assert "astro-ph.IM" in themes.build_plan(defs)["arxiv"]

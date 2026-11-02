@@ -31,6 +31,25 @@ def load_local(skills_dir):
     return themes
 
 
+def from_config(cfg):
+    """Themes defined in a configuration's ``themes`` block.
+
+    Parameters
+    ----------
+    cfg : dict
+        Configuration.
+
+    Returns
+    -------
+    dict
+        Theme name -> definition, ``name`` filled from the key.
+    """
+    out = {}
+    for name, theme in ((cfg or {}).get("themes") or {}).items():
+        out[str(name)] = dict(theme or {}, name=str(name))
+    return out
+
+
 def merge(local, remote):
     """Themes from both sources; the installed (local) copy wins."""
     out = dict(remote or {})
@@ -114,6 +133,8 @@ def validate(theme, name=None):
         value = keywords.get(key) or []
         if not isinstance(value, list) or not all(isinstance(v, str) and v.strip() for v in value):
             errors.append(f"keywords.{key}: list of non-empty strings")
+    if not isinstance(theme.get("guidance") or "", str):
+        errors.append("guidance: text")
     for key in ("authors", "examples"):
         value = theme.get(key) or []
         if not isinstance(value, list):

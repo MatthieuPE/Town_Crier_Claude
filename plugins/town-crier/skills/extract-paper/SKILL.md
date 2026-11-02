@@ -16,8 +16,9 @@ Base skill. Theme skills named `extract-paper-<theme>` extend it.
    - If the result was saved to a file (the tool output gives its path):
      `TC cut --run RUN --paper <paper_id> --input <path>`, then read
      `RUN/fulltext/<paper>.txt`. Only the configured sections are kept, to save tokens.
-   - If the result came back inline, use it directly and note it
-     (`TC note --run RUN --text "<paper_id>: full text read whole"`).
+   - If the result came back inline (short papers), use it directly. No copy is saved, so for
+     every number you take from it record the exact sentence it comes from:
+     `TC verify --run RUN --paper <paper_id> --number <n> --quote "<words of the paper>"`.
    - If alphaXiv fails, is not connected, or the paper is not on arXiv: use the abstract
      and note it.
 3. **Categories 2 and 3, or `full_text.source: abstract`:** use the abstract.
