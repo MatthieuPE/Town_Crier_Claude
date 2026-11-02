@@ -58,3 +58,17 @@ def test_bad_settings_raise():
         compute_period(D(2026, 10, 23), unit="year")
     with pytest.raises(ValueError):
         compute_period(D(2026, 10, 23), length=3, unit="week", anchor="calendar")
+
+
+@pytest.mark.run
+@pytest.mark.period
+@pytest.mark.unit
+@pytest.mark.parametrize("run, week_end, start, end", [
+    (D(2026, 11, 8), 5, D(2026, 11, 1), D(2026, 11, 7)),    # Sunday run, week ends Saturday
+    (D(2026, 11, 9), 5, D(2026, 11, 1), D(2026, 11, 7)),    # delayed to Monday: same week
+    (D(2026, 11, 8), 6, D(2026, 10, 26), D(2026, 11, 1)),   # Sunday run, week ends Sunday
+])
+def test_calendar_week_end(run, week_end, start, end):
+    """One-week calendar windows end on the last week_end day before the run."""
+    p = compute_period(run, unit="week", anchor="calendar", week_end=week_end)
+    assert (p.start, p.end) == (start, end)

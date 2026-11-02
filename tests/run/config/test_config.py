@@ -71,3 +71,20 @@ def test_plugin_themes_are_valid(plugin_themes):
 def test_title_screening_default():
     """Pools above 40 candidates are screened on titles first by default."""
     assert config.load()["selection"]["title_screen_above"] == 40
+
+
+@pytest.mark.run
+@pytest.mark.config
+@pytest.mark.unit
+def test_sunday_schedule_and_screening_off(tmp_path, plugin_themes):
+    """A Sunday schedule gives Sunday-Saturday weeks; screening can be off globally or per subsection."""
+    import datetime as dt
+    path = tmp_path / "c.yaml"
+    path.write_text("schedule: {weekday: sunday}\nselection: {title_screen_above: off}\n"
+                    "sections:\n  - title: X\n    subsections:\n"
+                    "      - {theme: cosmology, category: 2}\n"
+                    "      - {theme: cosmology, category: 2, title_screen_above: 25}\n")
+    resolved = config.resolve(config.load(path), plugin_themes, dt.date(2026, 11, 8), anchor="calendar")
+    assert (resolved["period"]["start"], resolved["period"]["end"]) == ("2026-11-01", "2026-11-07")
+    subs = list(config.iter_subsections(resolved))
+    assert subs[0]["title_screen_above"] is None and subs[1]["title_screen_above"] == 25

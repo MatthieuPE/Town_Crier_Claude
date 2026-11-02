@@ -84,7 +84,24 @@ def rolling_start(end, length, unit):
     return add_months(end, -length) + ONE_DAY
 
 
-def calendar_window(run_date, length, unit):
+WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+
+
+def weekday_index(name):
+    """Index of a weekday name (Monday = 0).
+
+    Raises
+    ------
+    ValueError
+        Unknown name.
+    """
+    key = str(name).strip().lower()
+    if key not in WEEKDAYS:
+        raise ValueError(f"unknown weekday {name!r}; use one of {WEEKDAYS}")
+    return WEEKDAYS.index(key)
+
+
+def calendar_window(run_date, length, unit, week_end=6):
     """Window aligned on calendar boundaries, for scheduled runs.
 
     Parameters
@@ -95,6 +112,9 @@ def calendar_window(run_date, length, unit):
         Units covered.
     unit : str
         ``day``, ``week`` or ``month``.
+    week_end : int
+        Last weekday of a week (Monday = 0, default Sunday). One-week windows
+        end on the last such day before the run day.
 
     Returns
     -------
@@ -111,7 +131,8 @@ def calendar_window(run_date, length, unit):
         end = run_date - ONE_DAY
         return end - dt.timedelta(days=length - 1), end
     if unit == "week" and length == 1:
-        end = run_date - dt.timedelta(days=run_date.weekday() + 1)  # last Sunday
+        back = (run_date.weekday() - week_end - 1) % 7 + 1  # days back to last week_end
+        end = run_date - dt.timedelta(days=back)
         return end - dt.timedelta(days=6), end
     if unit == "week" and length == 2:
         if run_date.day >= 15:
@@ -124,7 +145,7 @@ def calendar_window(run_date, length, unit):
     raise ValueError("calendar anchor supports days, 1 or 2 weeks, and months")
 
 
-def compute_period(run_date, length=1, unit="week", end="yesterday", anchor="rolling"):
+def compute_period(run_date, length=1, unit="week", end="yesterday", anchor="rolling", week_end=6):
     """Covered period.
 
     Parameters
@@ -158,7 +179,7 @@ def compute_period(run_date, length=1, unit="week", end="yesterday", anchor="rol
     if anchor not in ANCHORS:
         raise ValueError(f"period.anchor must be one of {ANCHORS}, not {anchor!r}")
     if anchor == "calendar":
-        start, last = calendar_window(run_date, length, unit)
+        start, last = calendar_window(run_date, length, unit, week_end)
     else:
         last = resolve_end(end, run_date)
         start = rolling_start(last, length, unit)

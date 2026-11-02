@@ -18,7 +18,8 @@ period:
   unit: week            # day | week | month
   end: yesterday        # yesterday | today | YYYY-MM-DD (rolling anchor only)
   anchor: rolling       # rolling: `length` units ending on `end`
-                        # calendar: aligned windows (Mon–Sun weeks, half-months, months); set by scheduled tasks
+                        # calendar: aligned windows (weeks, half-months, months); set by scheduled tasks
+  week_end: null        # last day of a calendar week; null = the day before schedule.weekday
 
 output:
   title: The Town Crier
@@ -37,7 +38,9 @@ schedule:
 
 # Review of candidates.
 selection:
-  title_screen_above: 40    # bigger pools are screened on titles first (saves tokens)
+  title_screen_above: 40    # bigger pools are screened on titles first (saves tokens);
+                            # off = always read every abstract (more precise ranking, more tokens).
+                            # A subsection can override it: title_screen_above: off
 
 # Full text, read for category 1 papers only.
 full_text:

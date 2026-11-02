@@ -20,7 +20,7 @@ the task's prompt is self-contained and points to the configuration in the repos
    | Period | Runs | Cron (local time) |
    |---|---|---|
    | 1 day | every day | `M H * * *` |
-   | 1 week | every week on `schedule.weekday` | `M H * * D` |
+   | 1 week | every week on `schedule.weekday` | `M H * * D` (the week ends the day before: a Sunday run covers Sunday–Saturday) |
    | 2 weeks | 1st and 15th of each month (half-months) | `M H 1,15 * *` |
    | N months (N = 1, 2, 3, 4, 6 or 12) | on `schedule.day_of_month`, every N months | `M H day */N *` (`*` when N = 1) |
 

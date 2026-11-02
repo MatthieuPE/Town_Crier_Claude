@@ -17,7 +17,8 @@ Check a configuration with `tc.py resolve --config <file> --dry-run`.
 | `length` | integer ≥ 1 | `1` | Number of units covered. |
 | `unit` | `day`, `week`, `month` | `week` | Unit. |
 | `end` | `yesterday`, `today`, `YYYY-MM-DD` | `yesterday` | Last covered day (rolling anchor). |
-| `anchor` | `rolling`, `calendar` | `rolling` | Rolling: `length` units ending on `end`. Calendar: Monday–Sunday weeks, half-months (1st–14th, 15th–end) for 2 weeks, calendar months; always ending before the run day. Scheduled tasks use `calendar`. |
+| `anchor` | `rolling`, `calendar` | `rolling` | Rolling: `length` units ending on `end`. Calendar: one-week windows ending on `week_end`, half-months (1st–14th, 15th–end) for 2 weeks, calendar months; always ending before the run day. Scheduled tasks use `calendar`. |
+| `week_end` | weekday name or `null` | `null` | Last day of a calendar week. `null`: the day before `schedule.weekday` (Sunday runs cover Sunday–Saturday; Monday runs, Monday–Sunday). |
 
 ## `output`
 | Field | Default | Meaning |
@@ -40,7 +41,7 @@ Check a configuration with `tc.py resolve --config <file> --dry-run`.
 ## `selection`
 | Field | Default | Meaning |
 |---|---|---|
-| `title_screen_above` | `40` | Pools larger than this are screened on titles before reading abstracts. Lower = fewer tokens; abstracts are always read before a paper can be summarized. |
+| `title_screen_above` | `40` | Pools larger than this are screened on titles before reading abstracts. Lower = fewer tokens; abstracts are always read before a paper can be summarized. `off`: every abstract is read (most precise ranking, most tokens). A subsection can set its own value. |
 
 ## `full_text` (category 1)
 | Field | Default | Meaning |
@@ -67,6 +68,7 @@ A list of sections, each with a `title` and `subsections`. Numbered in order (1,
 | `category` | yes | Summary level: 1, 2 or 3. |
 | `title` | no | Heading; default: the theme's title. |
 | `n_papers`, `rank_by`, `count`, `list_others`, `one_per_field`, `exclude_fields` | no | Override the category defaults. |
+| `title_screen_above` | no | Overrides `selection.title_screen_above`, e.g. `off` for one subsection. |
 | `full_text` | no | Overrides `full_text` (category 1). |
 | `skills.extract` | no | Theme skill extending `extract-paper`. |
 | `skills.summarize` | no | Theme skill extending `summarize-category-<category>`. |
