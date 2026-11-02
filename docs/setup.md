@@ -6,6 +6,11 @@ Steps 1–3 are done once, by the repository owner. Steps 4–6 are done by each
 Keep the repository **public**: Claude reads the `data` branch and the configurations
 through `raw.githubusercontent.com`, without credentials.
 
+Three entries start with a dot and are hidden by Finder and Windows Explorer: `.github/`
+(the workflows), `.claude-plugin/` (the marketplace file) and `.gitignore`. Check that they
+are on GitHub: without `.github/` there is no Actions workflow, and without
+`.claude-plugin/` the plugin cannot be installed.
+
 ## 2. Enable the daily fetch
 1. Open **Settings → Secrets and variables → Actions** in the repository.
 2. Add the secret `OPENALEX_API_KEY`: a free key from https://openalex.org/settings/api.
