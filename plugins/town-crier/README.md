@@ -9,8 +9,9 @@ Install in Claude Code: `/plugin install town-crier --marketplace MatthieuPE/Tow
 In claude.ai: add the marketplace `https://github.com/MatthieuPE/Town_Crier_Claude` under
 Customize → Plugins, then install **town-crier**.
 
-- Run it: ask Claude *"Run the Town Crier with configs/<name>.yaml"* (`cry` skill).
-- Set it up: *"Set up my Town Crier"* (`configure`), *"Define a theme"* (`define-theme`).
-- Automate it: *"Schedule my Town Crier"* (`schedule-cry`).
+- Set it up: *"Set up my Town Crier"* (`tcc-init`). Claude asks a few questions, stores your
+  configuration in a scheduled task and schedules the digest. No file, no GitHub push.
+- Change it: *"Send it on Fridays"*, *"add galaxy formation"* (`tcc-configure`).
+- Run it now: *"Run my Town Crier"* (`tcc-cry`). New topic: *"Define a theme"* (`tcc-define-theme`).
 
 Documentation: the repository [README](../../README.md) and [setup guide](../../docs/setup.md).

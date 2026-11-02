@@ -5,7 +5,7 @@ It runs from [`.github/workflows/fetch-papers.yml`](../.github/workflows/fetch-p
 
 ## What it fetches
 The union of the `databases` of every theme definition
-(`plugins/town-crier/skills/theme-*/theme.yaml`):
+(`plugins/town-crier/skills/tcc-theme-*/theme.yaml`):
 
 | Database | Query | Needs |
 |---|---|---|

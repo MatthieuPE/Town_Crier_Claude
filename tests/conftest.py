@@ -7,7 +7,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "pipeline"))  # town_crier_fetch
-sys.path.insert(0, str(ROOT / "plugins" / "town-crier" / "skills" / "cry" / "scripts"))  # towncrier
+sys.path.insert(0, str(ROOT / "plugins" / "town-crier" / "skills" / "tcc-cry" / "scripts"))  # towncrier
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def plugin_repo(tmp_path, theme_yaml):
         "science": theme_yaml("science", openalex={"Nature": ["0028-0836", "1476-4687"]}),
     }
     for name, text in specs.items():
-        folder = skills / f"theme-{name}"
+        folder = skills / f"tcc-theme-{name}"
         folder.mkdir(parents=True)
         (folder / "theme.yaml").write_text(text, encoding="utf-8")
     return tmp_path
