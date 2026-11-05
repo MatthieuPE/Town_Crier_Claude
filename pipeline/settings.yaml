@@ -2,7 +2,7 @@
 # Which databases and categories to fetch comes from the theme definitions:
 # plugins/town-crier/skills/tcc-theme-*/theme.yaml
 
-retention_days: 100        # days of papers kept in the data branch
+retention_days: 45        # days of papers kept in the data branch
 
 lookback_days:             # each run re-queries this window; papers are stored once
   arxiv: 14                # covers papers announced late (moderation holds)
