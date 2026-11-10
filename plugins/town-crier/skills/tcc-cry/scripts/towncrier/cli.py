@@ -9,6 +9,7 @@ run folder.
 import argparse
 import datetime as dt
 import json
+import re
 import sys
 import urllib.error
 from pathlib import Path
@@ -18,6 +19,7 @@ from . import (assemble, candidates, checks, config as config_mod, data, files, 
 
 EXIT_ERRORS = 2
 EXIT_NO_DATA = 3
+SUB_PREFIX = re.compile(r"^(\d+\.\d+) [^:]*: ")  # coverage notes start with "<id> <title>: "
 
 
 def _print(*lines):
@@ -46,12 +48,12 @@ def _records(run_dir):
     return {r["paper_id"]: r for r in files.read_jsonl(Path(run_dir) / "candidates.jsonl")}
 
 
-def add_note(run_dir, text):
+def add_note(run_dir, text, section=None):
     """Append a note shown at the top of the digest (no duplicates)."""
     path = Path(run_dir) / "notes.json"
     notes = files.read_json(path, [])
-    if text not in [n["text"] for n in notes]:
-        notes.append({"text": text})
+    if (text, section) not in [(n["text"], n.get("section")) for n in notes]:
+        notes.append({"text": text, "section": section})
         files.write_json(path, notes)
 
 
@@ -84,7 +86,7 @@ def cmd_resolve(args):
     _print(f"period: {p['start']} -> {p['end']} ({p['n_days']} days, {p['anchor']})")
     for sub in config_mod.iter_subsections(resolved):
         _print(f"  {sub['id']} {sub['title']} | theme {sub['theme']} | category {sub['category']} | "
-               f"{sub['n_papers']} paper(s) | extract: {sub['skills']['extract']} | "
+               f"up to {sub['n_papers']} summary(ies){' of score ' + str(sub['min_score']) if (sub.get('min_score') or 1) > 1 else ''} | extract: {sub['skills']['extract']} | "
                f"summarize: {sub['skills']['summarize']}")
     _print(*(f"WARNING {w}" for w in warnings))
     if errors:
@@ -120,7 +122,8 @@ def cmd_load(args):
     files.write_jsonl(run_dir / "candidates.jsonl", cands.values())
     files.write_json(run_dir / "pools.json", pools)
     for note in notes:
-        add_note(run_dir, note)
+        match = SUB_PREFIX.match(note)
+        add_note(run_dir, note[match.end():] if match else note, match.group(1) if match else None)
     _print(f"{len(records)} papers in the period; {len(cands)} candidates")
     for sub in config_mod.iter_subsections(resolved):
         n = len(pools[sub["id"]])
@@ -174,8 +177,9 @@ def cmd_import(args):
     fallback = files.read_json(run_dir / "fallback.json", {})
     fallback.update({sid: args.reason for sid in touched})
     files.write_json(run_dir / "fallback.json", fallback)
-    add_note(run_dir, f"Subsection(s) {', '.join(sorted(touched))}: papers found by search ({args.reason}); "
-                      "counts are unknown and lists may be incomplete.")
+    for sid in sorted(touched):
+        add_note(run_dir, f"Papers found by search ({args.reason}); the count is unknown and the list may "
+                          "be incomplete.", sid)
     _print(f"imported {len(rows)} paper(s) into {', '.join(sorted(touched))}")
     return 0
 
@@ -239,6 +243,12 @@ def cmd_finalize(args):
             full = sub["category"] == 1 and sub["full_text"]["source"] == "alphaxiv"
             _print(f"  - {j['paper_id']} [{'full text' if full else 'abstract'}] "
                    f"{sel['papers'][j['paper_id']]['title']}")
+        if not s["summaries"]:
+            floor = sub.get("min_score") or 1
+            _print(f"  nothing to summarize (no paper scored {floor} or more): the digest says so"
+                   + (" and lists the closest papers" if s["list"] else ""))
+        elif sub.get("summary_guidance"):
+            _print("  writing guidance: " + " ".join(sub["summary_guidance"].split()))
     return 0
 
 
@@ -297,8 +307,8 @@ def cmd_news(args):
 
 
 def cmd_note(args):
-    """Add a note to the top of the digest."""
-    add_note(args.run, args.text)
+    """Add a note under a section or subsection (or at the end of the digest)."""
+    add_note(args.run, args.text, args.section)
     _print("note added")
     return 0
 
@@ -452,9 +462,11 @@ def build_parser():
     p.add_argument("--outlet", required=True)
     p.set_defaults(func=cmd_news)
 
-    p = sub.add_parser("note", help="add a note to the top of the digest")
+    p = sub.add_parser("note", help="add a note under a section or subsection of the digest")
     p.add_argument("--run", required=True)
     p.add_argument("--text", required=True)
+    p.add_argument("--section", default=None,
+                   help="section (2) or subsection (2.1) the note belongs to; none = end of the digest")
     p.set_defaults(func=cmd_note)
 
     p = sub.add_parser("assemble", help="build the digest file")

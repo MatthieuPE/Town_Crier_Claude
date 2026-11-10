@@ -65,9 +65,15 @@ def entry_header(rec, judgment, category, news, labels):
     return f"#### [{link_title(rec)}]({rec['url']})\n" + " · ".join(meta)
 
 
-def list_line(rec, labels):
-    """One line of a category-1 list."""
-    return f"- [{link_title(rec)}]({rec['url']}) — {sheets.first_author(rec, labels['et_al'])}"
+def list_line(rec, labels, field=None):
+    """One line of a list of papers without summary; category 3 shows the field."""
+    tag = f"**{field}** · " if field else ""
+    return f"- {tag}[{link_title(rec)}]({rec['url']}) — {sheets.first_author(rec, labels['et_al'])}"
+
+
+def note_lines(notes, target, labels):
+    """Notes attached to one section or subsection, as quoted lines."""
+    return [f"> **{labels['note']}:** {n['text']}" for n in notes if str(n.get("section") or "") == target]
 
 
 def count_line(count, phrase, labels):
@@ -90,7 +96,9 @@ def render(resolved, selection, summaries, notes, news):
     summaries : dict
         Subsection id -> paper id -> body.
     notes : list of dict
-        Notes with a ``text`` key.
+        Notes with a ``text`` key and an optional ``section`` (section or
+        subsection id). Notes are shown under their section or subsection;
+        notes without one are gathered at the end, never at the top.
     news : dict
         Paper id -> ``{"url", "outlet"}``.
 
@@ -103,38 +111,57 @@ def render(resolved, selection, summaries, notes, news):
     period = resolved["period"]
     phrase = labels_mod.period_phrase(period, labels)
     papers = selection["papers"]
+    subs_sel = selection["subsections"]
     out = [f"# 📯 {resolved['output'].get('title', 'The Town Crier')} — {phrase}",
            f"*{labels_mod.fmt_date(period['start'], labels)} → {labels_mod.fmt_date(period['end'], labels)}*", ""]
-    if notes:
-        out += [f"> **{labels['notes']}**"] + [f"> - {n['text']}" for n in notes] + [""]
     if resolved["output"].get("contents", True):
         out.append(f"## {labels['contents']}")
         for sec in resolved["sections"]:
             out.append(f"- {sec['id']}. {sec['title']}")
             for sub in sec["subsections"]:
-                count = selection["subsections"][sub["id"]]["count"]
+                count = subs_sel[sub["id"]]["count"]
                 suffix = f" ({count})" if count is not None else ""
                 out.append(f"  - {sub['id']} {sub['title']}{suffix}")
         out.append("")
     for sec in resolved["sections"]:
         out += [f"## {sec['id']}. {sec['title']}", ""]
+        sec_notes = note_lines(notes, str(sec["id"]), labels)
+        if sec_notes:
+            out += sec_notes + [""]
+        empty = all(not subs_sel[s["id"]]["summaries"] and not subs_sel[s["id"]]["list"]
+                    for s in sec["subsections"])
+        if empty and not any(note_lines(notes, s["id"], labels) for s in sec["subsections"]):
+            out += [f"*{labels['empty_section'].format(period=phrase)}*", ""]
+            continue
         for sub in sec["subsections"]:
-            sel = selection["subsections"][sub["id"]]
+            sel = subs_sel[sub["id"]]
             out += [f"### {sub['id']} {sub['title']}"]
             if sub.get("count"):
                 out.append(f"*{count_line(sel['count'], phrase, labels)}*")
             out.append("")
+            sub_notes = note_lines(notes, sub["id"], labels)
+            if sub_notes:
+                out += sub_notes + [""]
             if not sel["summaries"] and not sel["list"]:
                 out += [f"*{labels['empty']}*", ""]
                 continue
+            if not sel["summaries"]:
+                out += [f"*{labels['no_close_fit'].format(period=phrase)}*", ""]
             bodies = summaries.get(sub["id"], {})
             for judgment in sel["summaries"]:
                 rec = papers[judgment["paper_id"]]
                 out += [entry_header(rec, judgment, sub["category"], news.get(rec["paper_id"]), labels),
                         "", bodies.get(rec["paper_id"], MISSING_BODY), ""]
             if sel["list"]:
-                out += [f"**{labels['others']}**", ""]
-                out += [list_line(papers[j["paper_id"]], labels) for j in sel["list"]] + [""]
+                heading = labels["others_3"] if sub["category"] == 3 else labels["others"]
+                out += [f"**{heading}**", ""]
+                out += [list_line(papers[j["paper_id"]], labels, j.get("field") if sub["category"] == 3 else None)
+                        for j in sel["list"]] + [""]
+    known = {str(s["id"]) for s in resolved["sections"]} | {
+        s["id"] for sec in resolved["sections"] for s in sec["subsections"]}
+    general = [n for n in notes if str(n.get("section") or "") not in known]
+    if general:
+        out += [f"## {labels['notes']}", ""] + [f"- {n['text']}" for n in general] + [""]
     out += ["---", f"*{labels['footer']}*", ""]
     return "\n".join(out)
 

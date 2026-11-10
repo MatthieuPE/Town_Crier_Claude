@@ -42,13 +42,17 @@ def test_render(parts):
     """Headings, counts, lists, empty subsections and category-3 tags come from the data."""
     resolved, selection, summaries = parts
     news = {"doi:x": {"url": "https://news.example/a", "outlet": "Example News"}}
-    text = assemble.render(resolved, selection, summaries, [{"text": "A note."}], news)
-    assert text.startswith("# 📯 The Town Crier — this week\n*12 October 2026 → 18 October 2026*")
-    assert "> - A note." in text
+    notes = [{"text": "A note.", "section": "2.1"}, {"text": "Section note.", "section": "1"},
+             {"text": "General note."}]
+    text = assemble.render(resolved, selection, summaries, notes, news)
+    assert text.startswith("# 📯 The Town Crier — this week\n*12 October 2026 → 18 October 2026*\n\n## Contents")
+    assert "## 1. Streams\n\n> **Note:** Section note.\n" in text
+    assert "### 2.1 Science at large\n\n> **Note:** A note.\n" in text
+    assert text.index("## Notes\n\n- General note.") > text.index("### 2.1")      # end, never at the top
     assert "  - 1.1 Stellar streams (2)" in text
     assert "*2 papers released on this theme this week.*" in text
     assert "#### [A (new) stream](https://arxiv.org/abs/1)\n*Ada Lovelace et al.*" in text
-    assert "- [Another stream](https://arxiv.org/abs/2) — Solo Author" in text
+    assert "**Other papers on this theme, closest first**\n\n- [Another stream](https://arxiv.org/abs/2) — Solo Author" in text
     assert "### 1.2 Empty theme\n*0 papers released on this theme this week.*\n\n*No new paper this period.*" in text
     assert "**Physics** · *Marie Curie* · *Nature* · [News: Example News](https://news.example/a)" in text
 
@@ -80,3 +84,17 @@ def test_sheet_shows_theme_guidance():
     sub = {"id": "1.1", "title": "T", "theme": "t", "category": 2, "rank_by": "impact", "guidance": "Prefer X."}
     text = sheets.render(sub, [], theme={"description": "Scope.", "guidance": "On theme: Y."})
     assert "Theme: Scope." in text and "On theme: Y." in text and "Prefer X." in text
+
+
+@pytest.mark.run
+@pytest.mark.assemble
+@pytest.mark.unit
+def test_no_close_fit_and_empty_section(parts):
+    """A subsection with only a list says so; a section with nothing says it in one line."""
+    resolved, selection, summaries = parts
+    selection["subsections"]["1.1"]["summaries"] = []
+    selection["subsections"]["2.1"]["summaries"] = []
+    text = assemble.render(resolved, selection, summaries, [], {})
+    assert "*No paper fit this theme closely enough for a summary this week.*\n\n**Other papers" in text
+    assert "## 2. Science at large\n\n*No new paper matched this section this week.*" in text
+    assert "### 2.1" not in text

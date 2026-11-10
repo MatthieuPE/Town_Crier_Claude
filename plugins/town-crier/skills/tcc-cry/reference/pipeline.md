@@ -33,7 +33,7 @@ the `databases` declared by all theme definitions.
 | `summaries/<id>.md` | Claude | Summary bodies, one block per paper |
 | `news.json` | `news` | News links of category-3 papers |
 | `verified.json` | `verify` | Quotes for numbers written differently in the paper |
-| `notes.json` | `note`, `load` | Notes shown at the top of the digest |
+| `notes.json` | `note`, `load` | Notes, shown under their section or subsection (or at the end) |
 | `fallback.json` | `import` | Subsections filled by search (counts unknown) |
 | `<output.filename>` | `assemble` | The digest |
 

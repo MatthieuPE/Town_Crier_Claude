@@ -97,3 +97,39 @@ def test_category_3_summarizes_research_only():
     sel = selection.finalize(resolved, {"1.1": list("ovr"), "1.2": ["d"]}, judged, records)
     assert [j["paper_id"] for j in sel["subsections"]["1.1"]["summaries"]] == ["r"]
     assert [j["paper_id"] for j in sel["subsections"]["1.2"]["summaries"]] == ["d"]
+
+
+@pytest.mark.run
+@pytest.mark.selection
+@pytest.mark.unit
+def test_only_close_fits_are_summarized():
+    """Below min_score nothing is summarized; the best others are listed, at most list_max."""
+    resolved = {"period": {}, "sections": [{"id": "1", "subsections": [
+        sub("1.1", 1, 3, min_score=3, list_max=5), sub("1.2", 1, 3, min_score=3, list_max=2)]}]}
+    J = selection.Judgment
+    judged = {"1.1": [J(f"a{i}", True, 2 if i < 3 else 1) for i in range(7)],
+              "1.2": [J("b0", True, 3), J("b1", True, 1), J("b2", True, 2), J("b3", True, 1)]}
+    records = {j.paper_id: {"paper_id": j.paper_id} for js in judged.values() for j in js}
+    sel = selection.finalize(resolved, {k: [j.paper_id for j in v] for k, v in judged.items()}, judged, records)
+    s = sel["subsections"]
+    assert s["1.1"]["summaries"] == [] and s["1.1"]["count"] == 7
+    assert [j["paper_id"] for j in s["1.1"]["list"]] == ["a0", "a1", "a2", "a3", "a4"]   # best first
+    assert [j["paper_id"] for j in s["1.2"]["summaries"]] == ["b0"]
+    assert [j["paper_id"] for j in s["1.2"]["list"]] == ["b2", "b1"]
+
+
+@pytest.mark.run
+@pytest.mark.selection
+@pytest.mark.unit
+def test_category_3_lists_one_per_field():
+    """Category 3: one summary; the list skips the summary's field and repeats no field."""
+    resolved = {"period": {}, "sections": [{"id": "1", "subsections": [sub("1.1", 3, 1, list_max=5)]}]}
+    J = selection.Judgment
+    judged = {"1.1": [J("a", True, 3, field="Biology"), J("b", True, 3, field="Biology"),
+                      J("c", True, 2, field="Physics"), J("d", True, 2, field="Physics"),
+                      J("e", True, 1, field="Chemistry & materials")]}
+    records = {p: {"paper_id": p} for p in "abcde"}
+    sel = selection.finalize(resolved, {"1.1": list("abcde")}, judged, records)
+    s = sel["subsections"]["1.1"]
+    assert [j["paper_id"] for j in s["summaries"]] == ["a"]
+    assert [j["paper_id"] for j in s["list"]] == ["c", "e"]

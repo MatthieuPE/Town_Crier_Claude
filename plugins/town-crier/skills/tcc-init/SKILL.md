@@ -36,7 +36,8 @@ Do not ask the user to type a prompt or a YAML value. Free text is only for an "
 1. *Which area is closest to your own research?* Options: the themes of the plugin
    (cosmology, galactic archaeology, galaxy formation, stellar streams). Multi-select.
    These become section 1, category 1 (deep summaries, full text read).
-2. *How many deep summaries per week?* 1, 2, 3 (default), 5.
+2. *At most how many deep summaries per topic each week?* 1, 2, 3 (default), 5. Only close
+   fits are summarized, so some weeks have fewer; the 5 closest other papers are listed.
 3. *Rank them by:* fit to my topic (default), or impact.
 
 **Call 2: the surrounding field.**
@@ -51,6 +52,11 @@ Do not ask the user to type a prompt or a YAML value. Free text is only for an "
 2. *Which day and time?* Offer Monday 08:00 (default), Friday 17:00, Sunday evening, other.
 3. *Language?* English (default), French, Italian, other.
 
+**Only if the user says some parts of their topic are outside their expertise** (e.g.
+"I don't know much about chemistry"): add a `summary_guidance` to that subsection, e.g.
+"The reader is not a specialist of chemical abundances: when they are central, explain
+them simply." Do not ask about it otherwise.
+
 **Only if the user mentions a topic no theme covers** (e.g. "weak lensing", "21 cm"):
 say it in one sentence, then use `tcc-define-theme` in its inline form (a `themes:` block in
 the configuration, no file). Use only arXiv categories that are already fetched, otherwise
@@ -60,7 +66,7 @@ Ask for the time zone (IANA name) only if it cannot be guessed from the conversa
 
 ## Build, check, confirm
 1. Write the YAML to a scratch file `town-crier.yaml`: title for each section, subsections with
-   `theme` and `category`, `n_papers`, `rank_by`, `exclude_fields`, `period`, `schedule`,
+   `theme` and `category`, `n_papers`, `rank_by`, `exclude_fields`, `summary_guidance`, `period`, `schedule`,
    `output.language`. Keep comments short.
 2. `TC resolve --config town-crier.yaml --dry-run`. Fix every `ERROR`.
 3. Summarise it to the user in plain language (not YAML): sections, themes, number of papers,

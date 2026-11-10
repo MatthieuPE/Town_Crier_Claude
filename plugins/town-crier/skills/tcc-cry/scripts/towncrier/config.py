@@ -101,11 +101,12 @@ def resolve_subsection(sid, sub, cfg, theme):
     cat = sub.get("category")
     out = {"id": sid, "theme": sub.get("theme"), "category": cat,
            "title": sub.get("title") or (theme or {}).get("title") or sub.get("theme"),
-           "guidance": sub.get("guidance")}
+           "guidance": sub.get("guidance"),
+           "summary_guidance": sub.get("summary_guidance") or (theme or {}).get("summary_guidance")}
     defaults = (cfg.get("defaults") or {}).get(f"category_{cat}") or {}
     for key, value in defaults.items():
         out[key] = sub.get(key, value)
-    for key in ("n_papers", "rank_by", "count"):
+    for key in ("n_papers", "rank_by", "count", "min_score", "list_others", "list_max"):
         out.setdefault(key, sub.get(key))
     sel = cfg.get("selection") or {}
     out["title_screen_above"] = screen_limit(sub.get("title_screen_above", sel.get("title_screen_above", 40)))
@@ -168,7 +169,12 @@ def resolve(cfg, themes, run_date, anchor=None):
     sections, used = [], {}
     for i, sec in enumerate(cfg.get("sections") or [], 1):
         subs = []
-        for j, sub in enumerate(sec.get("subsections") or [], 1):
+        raw = sec.get("subsections") or []
+        # a subsection without a category takes its section's, else the first subsection's
+        sec_cat = sec.get("category") or next((s.get("category") for s in raw if s.get("category")), None)
+        for j, sub in enumerate(raw, 1):
+            if not sub.get("category") and sec_cat:
+                sub = {**sub, "category": sec_cat}
             theme = themes.get(sub.get("theme"))
             if theme:
                 used[sub["theme"]] = theme

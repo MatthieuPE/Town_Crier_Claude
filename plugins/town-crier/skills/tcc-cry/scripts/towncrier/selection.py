@@ -119,9 +119,10 @@ def _picks(sub, order, taken):
     """Papers summarized in a subsection."""
     allowed = vocab.SUMMARY_KINDS[sub["category"]]
     excluded = {vocab.match_field(f) for f in sub.get("exclude_fields") or []}
+    floor = sub.get("min_score") or 1
     picks, fields = [], set()
     for j in order:
-        if j.paper_id in taken or j.kind not in allowed:
+        if j.paper_id in taken or j.kind not in allowed or j.score < floor:
             continue
         if sub["category"] == 3:
             field = vocab.match_field(j.field)
@@ -134,12 +135,27 @@ def _picks(sub, order, taken):
     return picks
 
 
+def _field_filter(sub, order, used):
+    """Category-3 papers outside excluded fields, one per field when asked."""
+    excluded = {vocab.match_field(f) for f in sub.get("exclude_fields") or []}
+    used, kept = set(used), []
+    for j in order:
+        field = vocab.match_field(j.field)
+        if field in excluded or (sub.get("one_per_field", True) and field in used):
+            continue
+        used.add(field)
+        kept.append(j)
+    return kept
+
+
 def finalize(resolved, pools, judgments, records, uncounted=()):
     """Summaries, lists and counts of every subsection.
 
     Summaries are served in reading order; a paper summarized once is
-    skipped afterwards. Category 1 lists then hold the remaining on-theme
-    papers not summarized anywhere and not listed earlier.
+    skipped afterwards. Only papers scored at least ``min_score`` are
+    summarized, so a subsection can have none. Subsections with
+    ``list_others`` then list their best remaining on-theme papers (at most
+    ``list_max``), not summarized anywhere and not listed earlier.
 
     Parameters
     ----------
@@ -177,9 +193,15 @@ def finalize(resolved, pools, judgments, records, uncounted=()):
         }
     listed = set()
     for sub in subs:
-        if sub["category"] != 1 or not sub.get("list_others", True):
+        if not sub.get("list_others"):
             continue
-        rest = [j for j in order[sub["id"]] if j.paper_id not in summarized and j.paper_id not in listed]
+        listable = vocab.LIST_KINDS[sub["category"]]
+        rest = [j for j in order[sub["id"]] if j.paper_id not in summarized
+                and j.paper_id not in listed and j.kind in listable]
+        if sub["category"] == 3:
+            rest = _field_filter(sub, rest, {vocab.match_field(j["field"]) for j in out[sub["id"]]["summaries"]})
+        if sub.get("list_max"):
+            rest = rest[:sub["list_max"]]
         listed.update(j.paper_id for j in rest)
         out[sub["id"]]["list"] = [asdict(j) for j in rest]
     used = summarized | listed

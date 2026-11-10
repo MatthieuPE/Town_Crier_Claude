@@ -45,7 +45,7 @@ alphaXiv → Tool permissions). Without it, category 1 is summarized from abstra
 1. Ask Claude *"Set up my Town Crier"* (`tcc-init`). Answer the questions; nothing to edit
    or push. Your configuration is stored in the scheduled task Claude creates.
 2. Accept the first digest it offers, and read it.
-3. Accept the one-off test run it offers, and check the digest: the notes at the top say whether full texts were read and whether anything
+3. Accept the one-off test run it offers, and check the digest: the notes under each section say whether full texts were read and whether anything
    failed. If runs wait for approvals, switch the scheduled task to **Automatically approve**
    in its settings.
 

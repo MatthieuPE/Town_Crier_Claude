@@ -11,14 +11,14 @@ Sections hold subsections. Each subsection has one **theme** and one **summary c
 
 | Category | For | Summary |
 |---|---|---|
-| 1 | Specific research | The 3 best-fitting papers in bullets (Context, Aims, Methods, Results, Conclusions), from their full text; then the list of all other new papers on the theme |
-| 2 | Opening on the same field | The strongest result of the period, at most 10 sentences in the field's vocabulary |
-| 3 | Opening on other fields | Major results in any field, at most 10 sentences for a high-school science student, with a news link |
+| 1 | Specific research | Up to 3 close fits in bullets (Context, Aims, Methods, Results, Conclusions), from their full text; none in a week without a close fit. Then the 5 closest other papers, listed |
+| 2 | Opening on the same field | The strongest result of the period, at most 10 sentences, for a graduate-level reader, mostly explaining the specific physics and the open question |
+| 3 | Opening on other fields | One major result from any field, in plain words for a high-school or first-year university student, with a news link; up to 5 others listed |
 
 Categories 1 and 2 also give the number of papers released on their theme during the period.
 A paper appears only once per digest.
 
-Default structure: (1) your main theme, a category-1 and a category-2 subsection;
+Default structure: (1) your main themes, all in category 1 (subsections take the first one's category by default);
 (2) "Next door", several close fields in category 2; (3) "Science at large", category 3.
 
 ## Accuracy

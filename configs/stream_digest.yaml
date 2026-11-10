@@ -1,4 +1,7 @@
 # Stream digest: a complete example configuration.
+# Category 1 (section 1): 0 to 3 close fits summarized per subsection, the 5 closest others listed.
+# Category 2 (section 2): the strongest paper, mostly explaining its physics.
+# Category 3 (section 3): one result explained simply, up to 5 others listed.
 # Weekly digest for a researcher probing dark matter with stellar streams.
 # Themes are written here, in the `themes` block: no skill file is needed.
 # The daily GitHub Action fetches the categories they declare.
@@ -47,6 +50,11 @@ themes:
       Relevance: 3 = a dark matter constraint or forecast from streams, or a perturbation
       systematic quantified for such studies; 2 = stream dynamics or modelling useful to
       dark matter inference; 1 = streams are context only. Prefer Milky Way work at equal fit.
+    summary_guidance: &chemistry |
+      The reader is a stream dynamicist, not a specialist of stellar chemistry. When chemical
+      abundances or chemodynamics are central to a paper, explain them simply: what the
+      abundance or ratio traces (age, origin, star formation history of the progenitor) and
+      why it matters for the stream. Standard notation such as [Fe/H] can stay.
 
   stream-observations:
     title: Observing streams and survey systematics
@@ -77,9 +85,12 @@ themes:
         structure or star-galaxy separation.
       Off theme: papers that only apply standard systematics corrections; cosmology results
       whose main topic is not the systematics themselves.
-      Impact: 3 = a new survey, catalogue or method likely to change stream work, or a
-      quantified systematic with clear consequences; 2 = solid new detections or analysis;
-      1 = incremental.
+      Relevance: 3 = the main subject is detecting or characterising streams or tidal
+      features in photometric surveys, or a quantified survey systematic (or a method against
+      it) with direct consequences for such measurements; 2 = survey methods or data products
+      useful to stream work, or new stream detections with other data; 1 = related context.
+      Prefer Milky Way work at equal fit.
+    summary_guidance: *chemistry
 
   cosmology-non-cmb:
     title: Cosmology (non-CMB)
@@ -137,8 +148,7 @@ sections:
     subsections:
       - theme: streams-dark-matter
         category: 1
-      - theme: stream-observations
-        category: 2
+      - theme: stream-observations       # category 1, like the first subsection of the section
 
   - title: Next door
     subsections:

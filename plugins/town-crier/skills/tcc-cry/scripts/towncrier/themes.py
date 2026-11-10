@@ -133,8 +133,9 @@ def validate(theme, name=None):
         value = keywords.get(key) or []
         if not isinstance(value, list) or not all(isinstance(v, str) and v.strip() for v in value):
             errors.append(f"keywords.{key}: list of non-empty strings")
-    if not isinstance(theme.get("guidance") or "", str):
-        errors.append("guidance: text")
+    for key in ("guidance", "summary_guidance"):
+        if not isinstance(theme.get(key) or "", str):
+            errors.append(f"{key}: text")
     for key in ("authors", "examples"):
         value = theme.get(key) or []
         if not isinstance(value, list):
