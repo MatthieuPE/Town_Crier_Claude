@@ -21,6 +21,9 @@ KINDS = ("research", "review", "proceedings", "erratum", "other")
 SUMMARY_KINDS = {1: {"research", "review", "proceedings", "other"}, 2: {"research", "other"},
                  3: {"research"}}
 
+# kinds of papers each category can list without a summary
+LIST_KINDS = {1: set(KINDS) - {"erratum"}, 2: {"research", "other"}, 3: {"research"}}
+
 # sections that can be read from full texts
 SECTIONS = ("abstract", "introduction", "methods", "results", "discussion", "conclusions")
 

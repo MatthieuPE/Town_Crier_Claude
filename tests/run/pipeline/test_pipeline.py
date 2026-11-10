@@ -29,6 +29,12 @@ def test_full_run(tmp_path, user_config, data_dir, judgments, summaries, capsys)
     sel = json.loads((run / "selection.json").read_text())
     assert sel["subsections"]["1.1"]["count"] == 3
     assert [j["paper_id"] for j in sel["subsections"]["2.1"]["summaries"]] == ["arXiv:2610.10005"]
+    # category 1: only close fits (score 3) are summarized; the others are listed
+    assert sorted(j["paper_id"] for j in sel["subsections"]["1.1"]["summaries"]) == ["arXiv:2610.10001", "arXiv:2610.10002"]
+    assert [j["paper_id"] for j in sel["subsections"]["1.1"]["list"]] == ["arXiv:2610.10003"]
+    # category 3: one paper summarized, the next one listed
+    assert [j["paper_id"] for j in sel["subsections"]["3.1"]["summaries"]] == ["doi:10.1038/test.1"]
+    assert [j["paper_id"] for j in sel["subsections"]["3.1"]["list"]] == ["doi:10.1038/test.2"]
 
     full = tmp_path / "paper.txt"
     full.write_text("ABSTRACT\nWe detect a stream.\n3. RESULTS\nThe stream is 35 pc wide.\n")
@@ -45,6 +51,7 @@ def test_full_run(tmp_path, user_config, data_dir, judgments, summaries, capsys)
     digest = (run / "town-crier_2026-10-12_2026-10-18.md").read_text()
     assert "### 1.1 Stellar streams\n*3 papers released on this theme this week.*" in digest
     assert "[News: Example News](https://news.example/sc)" in digest
+    assert "**Other notable results**\n\n- **Medicine & health** · [" in digest
 
     # an invented number is caught
     path = run / "summaries" / "1.1.md"
@@ -107,4 +114,5 @@ def test_fallback_import(tmp_path, user_config, capsys):
     assert tc("check", "--run", run) == 0, capsys.readouterr().out
     digest = (run / "town-crier_2026-10-12_2026-10-18.md").read_text()
     assert "Number of papers released on this theme this week: unknown." in digest
-    assert "papers found by search (data branch unreachable)" in digest
+    assert "> **Note:** Papers found by search (data branch unreachable)" in digest
+    assert digest.index("### 1.1") < digest.index("> **Note:**")       # under its subsection, not at the top

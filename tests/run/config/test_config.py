@@ -103,4 +103,23 @@ def test_themes_written_in_configuration(repo_root, plugin_themes):
     assert errors == []
     assert (resolved["period"]["start"], resolved["period"]["end"]) == ("2026-11-01", "2026-11-07")
     assert resolved["themes"]["streams-dark-matter"]["guidance"].startswith("On theme")
-    assert list(config.iter_subsections(resolved))[-1]["guidance"].startswith("Astronomy")
+    subs = list(config.iter_subsections(resolved))
+    assert subs[-1]["guidance"].startswith("Astronomy")
+    assert [s["category"] for s in subs[:2]] == [1, 1]                  # same bullets in 1.1 and 1.2
+    assert subs[0]["min_score"] == 3 and subs[0]["list_max"] == 5
+    assert "chemistry" in subs[1]["summary_guidance"]                   # theme's writing guidance
+    assert subs[-1]["n_papers"] == 1 and subs[-1]["list_others"] is True
+
+
+@pytest.mark.run
+@pytest.mark.config
+@pytest.mark.unit
+def test_category_inherited_in_section(tmp_path, plugin_themes, run_date):
+    """A subsection without a category takes the first subsection's, or the section's."""
+    path = tmp_path / "c.yaml"
+    path.write_text("sections:\n  - title: A\n    subsections:\n"
+                    "      - {theme: stellar-streams, category: 1}\n      - {theme: galactic-archaeology}\n"
+                    "  - title: B\n    category: 2\n    subsections:\n      - {theme: cosmology}\n")
+    resolved = config.resolve(config.load(path), plugin_themes, run_date)
+    assert [s["category"] for s in config.iter_subsections(resolved)] == [1, 1, 2]
+    assert config.validate(config.load(path), resolved, plugin_themes)[0] == []

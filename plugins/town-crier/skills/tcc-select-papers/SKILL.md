@@ -35,6 +35,9 @@ removes duplicates across subsections and counts papers per theme.
      A very short abstract often signals one.
    - Score 1-3, by the subsection's `rank_by` (printed in the sheet header):
      - `relevance` (category 1): how closely the paper fits the theme. Use the theme's scale.
+       Be strict with 3: it means a close fit, whose main subject is the theme's targeted
+       science. Only score-3 papers are summarized in category 1 (`min_score`); a paper
+       that only touches the theme gets 2 or 1 and is listed without summary.
      - `impact` (categories 2 and 3): strength of the result. Favour a new measurement or
        detection, a high significance, a large data set, a first of its kind, a data release.
    - Kind (the sheet's flags are hints; decide from the paper):
@@ -52,7 +55,9 @@ removes duplicates across subsections and counts papers per theme.
 ## Then
 `TC finalize --run RUN`. It prints, per subsection, the count, the papers to summarize and
 whether to read their full text. Reading order decides: a paper summarized once is skipped
-later; category-1 lists hold the remaining on-theme papers.
+later. Papers below `min_score` are never summarized, so a subsection can have none.
+Lists (`list_others`) then hold the best remaining on-theme papers, at most `list_max`
+(default 5), closest first.
 
 ## Rules
 - Judge from the title and abstract shown, not from memory of the paper or its authors.

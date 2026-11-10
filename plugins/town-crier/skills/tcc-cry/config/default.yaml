@@ -50,19 +50,26 @@ full_text:
 # Per-category defaults; any subsection can override them.
 defaults:
   category_1:
-    n_papers: 3             # papers summarized
+    n_papers: 3             # at most this many papers summarized; none if no paper fits well
+    min_score: 3            # only papers judged a close fit (score 3) are summarized
     rank_by: relevance      # relevance (fit to the theme) | impact
     count: true             # show the number of papers of the period on the theme
-    list_others: true       # list the other new papers on the theme
+    list_others: true       # list the best other papers on the theme, without summary
+    list_max: 5             # at most this many listed; null = all
   category_2:
     n_papers: 1
+    min_score: 1
     rank_by: impact
     count: true
+    list_others: false
   category_3:
-    n_papers: 3
+    n_papers: 1             # one paper, explained simply
+    min_score: 1
     rank_by: impact
     count: false
-    one_per_field: true     # at most one paper per field
+    list_others: true       # the other strong results, as a list
+    list_max: 5
+    one_per_field: true     # lists hold at most one paper per field too
     exclude_fields: []      # e.g. ["Astronomy & astrophysics"]; tags in schema.md
 
 # Output structure: sections > subsections.
@@ -73,8 +80,7 @@ sections:
     subsections:
       - theme: "<THEME A>"      # e.g. stellar-streams
         category: 1
-      - theme: "<THEME B>"
-        category: 2
+      - theme: "<THEME B>"      # no category: same as the first subsection (1)
 
   - title: Next door
     subsections:

@@ -52,10 +52,12 @@ Check a configuration with `tc.py resolve --config <file> --dry-run`.
 ## `defaults` (per category; any subsection can override)
 | Field | Cat. 1 | Cat. 2 | Cat. 3 | Meaning |
 |---|---|---|---|---|
-| `n_papers` | 3 | 1 | 3 | Papers summarized. |
+| `n_papers` | 3 | 1 | 1 | Most papers summarized. |
+| `min_score` | 3 | 1 | 1 | Lowest score a summarized paper can have (scores 1-3 from stage 2). With 3, only close fits are summarized, so a week can have none. |
 | `rank_by` | `relevance` | `impact` | `impact` | Fit to the theme, or strength of the result. |
 | `count` | `true` | `true` | `false` | Show the number of papers of the period on the theme. |
-| `list_others` | `true` | — | — | List the other new papers on the theme. |
+| `list_others` | `true` | `false` | `true` | List the best other papers on the theme, without summary. |
+| `list_max` | 5 | — | 5 | Most papers listed, best first; `null` = all. |
 | `one_per_field` | — | — | `true` | At most one paper per field. |
 | `exclude_fields` | — | — | `[]` | Fields to skip (tags below). |
 
@@ -68,19 +70,23 @@ Themes written in the configuration, by name. They override plugin themes of the
 | `keywords` | `any`, `all`, `exclude`, `exclude_titles` (stage 1, see `docs/extending.md`). |
 | `authors`, `examples` | Always-kept authors; typical papers (`arXiv:...`). |
 | `guidance` | Free text for stage 2: on and off theme, scoring. Printed on each review sheet. |
+| `summary_guidance` | Free text for the summaries: what to explain simply for this reader (e.g. chemistry for a dynamicist). Printed by `finalize`. |
 | `skills` | Optional theme skills (`extract`, `summarize: {N: ...}`). |
 
 ## `sections`
-A list of sections, each with a `title` and `subsections`. Numbered in order (1, 1.1, ...).
+A list of sections, each with a `title`, an optional `category` and `subsections`.
+Numbered in order (1, 1.1, ...). A subsection without a `category` takes the section's, else
+the first subsection's.
 
 | Subsection field | Required | Meaning |
 |---|---|---|
 | `theme` | yes | Theme name: a `tcc-theme-<name>` skill of the plugin. |
-| `category` | yes | Summary level: 1, 2 or 3. |
+| `category` | no | Summary level: 1, 2 or 3. Default: the section's `category`, else the first subsection's. |
 | `title` | no | Heading; default: the theme's title. |
-| `n_papers`, `rank_by`, `count`, `list_others`, `one_per_field`, `exclude_fields` | no | Override the category defaults. |
+| `n_papers`, `min_score`, `rank_by`, `count`, `list_others`, `list_max`, `one_per_field`, `exclude_fields` | no | Override the category defaults. |
 | `title_screen_above` | no | Overrides `selection.title_screen_above`, e.g. `off` for one subsection. |
 | `guidance` | no | Extra judging rules for this subsection only, printed on its review sheet. |
+| `summary_guidance` | no | Writing rules for this subsection's summaries; replaces the theme's. |
 | `full_text` | no | Overrides `full_text` (category 1). |
 | `skills.extract` | no | Theme skill extending `tcc-extract-paper`. |
 | `skills.summarize` | no | Theme skill extending `tcc-summarize-category-<category>`. |
@@ -88,9 +94,9 @@ A list of sections, each with a `title` and `subsections`. Numbered in order (1,
 ## Summary categories
 | Category | For | Summary |
 |---|---|---|
-| 1 | Specific research | Bullets: Context, Aims, Methods, Results, Conclusions. Full text read. Other new papers listed. |
-| 2 | Opening on the same field | At most 10 sentences, mostly context, methods and conclusions, in the field's vocabulary. |
-| 3 | Opening on other fields | At most 10 sentences, for a high-school science student. Field tag and news link. Research papers only. |
+| 1 | Specific research | 0 to 3 close fits, in bullets: Context, Aims, Methods, Results, Conclusions. Full text read. The 5 closest other papers listed. |
+| 2 | Opening on the same field | At most 10 sentences for a graduate-level reader with a rough view of the sub-domain: about half explaining the specific physics and the open question, then what was found. |
+| 3 | Opening on other fields | One paper, 5 to 8 short sentences in plain words, for a high-school or first-year university student. Field tag and news link. Up to 5 other results listed. Research papers only. |
 
 ## Field tags (category 3)
 Astronomy & astrophysics · Physics · Chemistry & materials · Biology · Medicine & health ·

@@ -38,11 +38,14 @@ The default configuration has placeholders and is never run as is.
 3. **Select.** For each subsection, in order: load its theme skill (`town-crier:tcc-theme-<theme>`),
    then follow the `tcc-select-papers` skill. Then run `TC finalize --run RUN`.
 4. **Extract.** For each paper `finalize` lists: follow the subsection's extract skill.
-5. **Summarize.** For each subsection with papers: follow the subsection's summarize
-   skill. Write `RUN/summaries/<subsection id>.md`.
+5. **Summarize.** For each subsection with papers to summarize: follow the subsection's
+   summarize skill, with the writing guidance `finalize` prints. Write
+   `RUN/summaries/<subsection id>.md`. Skip subsections where `finalize` says "nothing to
+   summarize": the digest states it and shows the list.
 6. **Assemble and check.** Follow the `tcc-assemble-digest` skill until `TC check` reports 0 errors.
 7. **Deliver.** Send the digest file with SendUserFile (status `proactive` when unattended).
    Reply in two or three lines: the period, the number of papers summarized, any notes.
+   Keep the notes few: only what changes how the reader should trust a section.
 
 ## Skills per subsection
 `TC resolve` prints the extract and summarize skills of each subsection. A theme skill,
@@ -53,8 +56,9 @@ format and length limits always hold. Rules: `reference/pipeline.md`.
 ## Unattended runs
 A scheduled run has no one to answer questions.
 - Never ask. Use the configured values or the defaults.
-- Record each assumption or failure: `TC note --run RUN --text "..."`. Notes appear at the
-  top of the digest.
+- Record each assumption or failure: `TC note --run RUN --section <id> --text "..."`, with
+  the section (`2`) or subsection (`2.1`) it concerns. The note appears under that heading.
+  Without `--section`, it goes to a short Notes list at the end. Nothing goes at the top.
 - If one paper or subsection fails, note it and carry on with the rest.
 
 ## Rules

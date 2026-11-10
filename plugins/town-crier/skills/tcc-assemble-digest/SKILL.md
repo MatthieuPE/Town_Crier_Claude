@@ -9,13 +9,16 @@ description: Step 4 of the Town Crier pipeline. Use to assemble the digest file 
 
 ## Steps
 1. `TC assemble --run RUN`. It builds the digest from the data:
-   - header with the period, notes, and a table of contents;
+   - header with the period and a table of contents (no notes at the top);
    - one heading per section and subsection, with the count of papers on the theme
-     (categories 1 and 2 by default);
+     (categories 1 and 2 by default), and the notes attached to it;
    - for each summarized paper: linked title, first author, journal and, for category 3,
      field tag and news link, then the body from `summaries/`;
-   - for category 1: the list of the other new papers on the theme;
-   - "No new paper this period." for empty subsections.
+   - the list of the best other papers (categories 1 and 3 by default; at most 5);
+   - "No paper fit this theme closely enough for a summary" when only a list is shown;
+   - "No new paper this period." for empty subsections, and one line for a whole empty
+     section;
+   - notes without a section, in a short list at the end.
 2. `TC check --run RUN`.
 3. Fix every `ERROR`, then repeat steps 1 and 2 until there are none:
    - **Number not in the paper:** reread the paper's text (`RUN/fulltext/<paper>.txt` or the
