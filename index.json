@@ -1,0 +1,551 @@
+{
+ "databases": {
+  "arxiv": {
+   "coverage": {
+    "astro-ph.CO": "2026-09-28",
+    "astro-ph.GA": "2026-09-28",
+    "astro-ph.IM": "2026-10-19",
+    "astro-ph.SR": "2026-09-28"
+   },
+   "files": [
+    "2026-09-30",
+    "2026-10-01",
+    "2026-10-02",
+    "2026-10-03",
+    "2026-10-04",
+    "2026-10-05",
+    "2026-10-06",
+    "2026-10-07",
+    "2026-10-08",
+    "2026-10-09",
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-12",
+    "2026-10-13",
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16",
+    "2026-10-17",
+    "2026-10-18",
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22",
+    "2026-10-23",
+    "2026-10-24",
+    "2026-10-25",
+    "2026-10-26",
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29",
+    "2026-10-30",
+    "2026-11-03",
+    "2026-11-04",
+    "2026-11-05",
+    "2026-11-06",
+    "2026-11-09",
+    "2026-11-10",
+    "2026-11-11",
+    "2026-11-13",
+    "2026-11-14"
+   ],
+   "run_days": [
+    "2026-11-02",
+    "2026-11-03",
+    "2026-11-04",
+    "2026-11-05",
+    "2026-11-06",
+    "2026-11-07",
+    "2026-11-08",
+    "2026-11-09",
+    "2026-11-10",
+    "2026-11-11",
+    "2026-11-12",
+    "2026-11-13",
+    "2026-11-14"
+   ]
+  },
+  "openalex": {
+   "coverage": {
+    "0027-8424": "2026-09-28",
+    "0028-0836": "2026-09-28",
+    "0028-4793": "2026-09-28",
+    "0031-9007": "2026-09-28",
+    "0036-8075": "2026-09-28",
+    "0092-8674": "2026-09-28",
+    "1079-7114": "2026-09-28",
+    "1091-6490": "2026-09-28",
+    "1095-9203": "2026-09-28",
+    "1097-4172": "2026-09-28",
+    "1476-4687": "2026-09-28",
+    "1533-4406": "2026-09-28"
+   },
+   "files": [
+    "2026-09-30",
+    "2026-10-01",
+    "2026-10-02",
+    "2026-10-05",
+    "2026-10-06",
+    "2026-10-07",
+    "2026-10-08",
+    "2026-10-09",
+    "2026-10-12",
+    "2026-10-13",
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16",
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22",
+    "2026-10-23",
+    "2026-10-24",
+    "2026-10-25",
+    "2026-10-26",
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29",
+    "2026-10-30",
+    "2026-11-03",
+    "2026-11-04",
+    "2026-11-05",
+    "2026-11-06",
+    "2026-11-07",
+    "2026-11-08",
+    "2026-11-09",
+    "2026-11-10",
+    "2026-11-11",
+    "2026-11-12",
+    "2026-11-13",
+    "2026-11-14"
+   ],
+   "run_days": [
+    "2026-11-02",
+    "2026-11-03",
+    "2026-11-04",
+    "2026-11-05",
+    "2026-11-06",
+    "2026-11-07",
+    "2026-11-08",
+    "2026-11-09",
+    "2026-11-10",
+    "2026-11-11",
+    "2026-11-12",
+    "2026-11-13",
+    "2026-11-14"
+   ]
+  }
+ },
+ "last_run_day": "2026-11-14",
+ "plan": {
+  "arxiv": [
+   "astro-ph.CO",
+   "astro-ph.GA",
+   "astro-ph.IM",
+   "astro-ph.SR"
+  ],
+  "openalex": [
+   "0027-8424",
+   "0028-0836",
+   "0028-4793",
+   "0031-9007",
+   "0036-8075",
+   "0092-8674",
+   "1079-7114",
+   "1091-6490",
+   "1095-9203",
+   "1097-4172",
+   "1476-4687",
+   "1533-4406"
+  ]
+ },
+ "schema": 1,
+ "themes": {
+  "cmb": {
+   "databases": {
+    "arxiv": [
+     "astro-ph.CO"
+    ]
+   },
+   "description": "CMB temperature and polarisation, lensing, Sunyaev-Zel'dovich effects, spectral distortions, foregrounds and experiments.",
+   "guidance": "On theme: papers whose main subject is the CMB or its secondary anisotropies.\nOff theme: papers that only use CMB data as one input to another analysis.\nImpact: as for cosmology.\n",
+   "keywords": {
+    "any": [
+     "CMB",
+     "cosmic microwave background",
+     "B-mode*",
+     "E-mode*",
+     "Sunyaev-Zel'dovich",
+     "Sunyaev-Zeldovich",
+     "kSZ",
+     "tSZ",
+     "spectral distortion*",
+     "Simons Observatory",
+     "LiteBIRD",
+     "CMB-S4",
+     "Atacama Cosmology Telescope",
+     "South Pole Telescope"
+    ]
+   },
+   "name": "cmb",
+   "title": "Cosmic microwave background"
+  },
+  "cosmology": {
+   "authors": [],
+   "databases": {
+    "arxiv": [
+     "astro-ph.CO"
+    ]
+   },
+   "description": "Cosmological models and parameters, large-scale structure, the cosmic microwave background, dark matter and dark energy.",
+   "examples": [],
+   "keywords": {
+    "all": [],
+    "any": [],
+    "exclude": []
+   },
+   "name": "cosmology",
+   "skills": {
+    "extract": "tcc-extract-paper-cosmology",
+    "summarize": {
+     "1": null,
+     "2": "tcc-summarize-category-2-cosmology",
+     "3": null
+    }
+   },
+   "title": "Cosmology and dark matter"
+  },
+  "cosmology-non-cmb": {
+   "databases": {
+    "arxiv": [
+     "astro-ph.CO"
+    ]
+   },
+   "description": "Cosmology from large-scale structure, weak lensing, clusters, supernovae, BAO, line-intensity mapping, gravitational waves and dark matter, excluding CMB studies.",
+   "guidance": "On theme: any astro-ph.CO paper whose main subject is not the CMB.\nOff theme: papers whose main subject is the CMB (they belong to the CMB theme);\npapers that only use CMB data in a combination stay on theme.\nImpact: 3 = new cosmological constraints from a major survey or data release, or a\nresult that changes a known tension; 2 = solid new measurement or method; 1 = incremental.\n",
+   "name": "cosmology-non-cmb",
+   "title": "Cosmology (non-CMB)"
+  },
+  "galactic-archaeology": {
+   "authors": [],
+   "databases": {
+    "arxiv": [
+     "astro-ph.GA",
+     "astro-ph.SR"
+    ]
+   },
+   "description": "Structure, assembly history, chemistry and dynamics of the Milky Way from large stellar surveys: halo, discs and bulge, accreted populations and merger history.",
+   "examples": [],
+   "keywords": {
+    "all": [],
+    "any": [
+     "Milky Way",
+     "Galactic halo",
+     "stellar halo*",
+     "Galactic disc*",
+     "Galactic disk*",
+     "thick disc*",
+     "thick disk*",
+     "Galactic bulge",
+     "Galactic archaeology",
+     "accretion history",
+     "merger history",
+     "Gaia-Enceladus",
+     "Gaia-Sausage",
+     "chemodynamic*"
+    ],
+    "exclude": []
+   },
+   "name": "galactic-archaeology",
+   "skills": {
+    "extract": null,
+    "summarize": {
+     "1": null,
+     "2": null,
+     "3": null
+    }
+   },
+   "title": "Galactic archaeology"
+  },
+  "galaxy-dynamics": {
+   "databases": {
+    "arxiv": [
+     "astro-ph.GA"
+    ]
+   },
+   "description": "Dynamics of galaxies and of the Milky Way: potentials, orbits, bars and spirals, resonances, disc heating, dark matter haloes from kinematics, N-body methods.",
+   "guidance": "On theme: papers whose main subject is the dynamics of galaxies or of the Milky Way.\nOff theme: papers using kinematics only to classify objects; black hole accretion.\nImpact: 3 = a new dynamical measurement of the Milky Way or galaxies with broad\nconsequences (potential, dark matter halo, bar), or a major method; 2 = solid\nnew result; 1 = incremental.\n",
+   "keywords": {
+    "any": [
+     "galactic dynamics",
+     "galaxy dynamics",
+     "stellar dynamics",
+     "dynamical model*",
+     "gravitational potential",
+     "Galactic potential",
+     "galactic bar",
+     "bar pattern speed",
+     "spiral arm*",
+     "resonance*",
+     "action-angle",
+     "actions",
+     "phase space",
+     "phase-space",
+     "orbit*",
+     "rotation curve*",
+     "Jeans",
+     "dynamical friction",
+     "disc heating",
+     "disk heating",
+     "N-body",
+     "halo shape",
+     "dark matter halo*"
+    ]
+   },
+   "name": "galaxy-dynamics",
+   "title": "Galaxy dynamics"
+  },
+  "galaxy-formation": {
+   "authors": [],
+   "databases": {
+    "arxiv": [
+     "astro-ph.GA"
+    ]
+   },
+   "description": "How galaxies form and evolve across cosmic time: star formation, quenching, feedback, mergers, dwarf galaxies, the circumgalactic medium and high-redshift galaxies.",
+   "examples": [],
+   "keywords": {
+    "all": [],
+    "any": [
+     "galaxy formation",
+     "galaxy evolution",
+     "high-redshift galax*",
+     "star formation histor*",
+     "quench*",
+     "feedback",
+     "galaxy merger*",
+     "dwarf galax*",
+     "circumgalactic",
+     "CGM",
+     "JWST"
+    ],
+    "exclude": []
+   },
+   "name": "galaxy-formation",
+   "skills": {
+    "extract": null,
+    "summarize": {
+     "1": null,
+     "2": null,
+     "3": null
+    }
+   },
+   "title": "Galaxy formation and evolution"
+  },
+  "science-at-large": {
+   "authors": [],
+   "databases": {
+    "openalex": {
+     "journals": [
+      {
+       "issn": [
+        "0028-0836",
+        "1476-4687"
+       ],
+       "name": "Nature"
+      },
+      {
+       "issn": [
+        "0036-8075",
+        "1095-9203"
+       ],
+       "name": "Science"
+      },
+      {
+       "issn": [
+        "0092-8674",
+        "1097-4172"
+       ],
+       "name": "Cell"
+      },
+      {
+       "issn": [
+        "0027-8424",
+        "1091-6490"
+       ],
+       "name": "PNAS"
+      },
+      {
+       "issn": [
+        "0031-9007",
+        "1079-7114"
+       ],
+       "name": "Physical Review Letters"
+      },
+      {
+       "issn": [
+        "0028-4793",
+        "1533-4406"
+       ],
+       "name": "The New England Journal of Medicine"
+      }
+     ]
+    }
+   },
+   "description": "Major research results of the period in any scientific field, published in leading general-science journals.",
+   "examples": [],
+   "keywords": {
+    "all": [],
+    "any": [],
+    "exclude": [],
+    "exclude_titles": [
+     "In Science Journals",
+     "In Other Journals"
+    ]
+   },
+   "name": "science-at-large",
+   "skills": {
+    "extract": null,
+    "summarize": {
+     "1": null,
+     "2": null,
+     "3": null
+    }
+   },
+   "title": "Science at large"
+  },
+  "stellar-streams": {
+   "authors": [],
+   "databases": {
+    "arxiv": [
+     "astro-ph.GA",
+     "astro-ph.SR",
+     "astro-ph.CO"
+    ]
+   },
+   "description": "Detection, modelling and dynamics of stellar streams and tidal tails in the Milky Way and nearby galaxies, their progenitors (globular clusters, dwarf galaxies), and their use to constrain the Galactic potential, the dark matter halo and its substructure.",
+   "examples": [],
+   "keywords": {
+    "all": [],
+    "any": [
+     "stellar stream*",
+     "tidal stream*",
+     "tidal tail*",
+     "stream member*",
+     "stream gap*",
+     "GD-1",
+     "Pal 5",
+     "Palomar 5",
+     "Sagittarius stream",
+     "Orphan stream",
+     "Jhelum"
+    ],
+    "exclude": []
+   },
+   "name": "stellar-streams",
+   "skills": {
+    "extract": null,
+    "summarize": {
+     "1": null,
+     "2": null,
+     "3": null
+    }
+   },
+   "title": "Stellar streams"
+  },
+  "stream-observations": {
+   "databases": {
+    "arxiv": [
+     "astro-ph.GA",
+     "astro-ph.IM",
+     "astro-ph.CO"
+    ]
+   },
+   "description": "Detecting and characterising stellar streams and tidal features in photometric surveys, the impact of observational systematics on these measurements, and major advances against survey systematics (large-scale structure, star-galaxy separation).",
+   "examples": [
+    "arXiv:2609.10897"
+   ],
+   "guidance": "On theme:\n- Detection, mapping and characterisation of streams and tidal features with\n  photometric surveys (Gaia, DES, DELVE, Legacy Surveys, HSC, Rubin/LSST, Euclid, Roman),\n  in the Milky Way first, and around external galaxies.\n- Studies of how observational systematics (depth variations, extinction, photometric\n  errors, star-galaxy separation, crowding, calibration, completeness) affect stream or\n  stellar-halo measurements.\n- Major methods or data products that reduce survey systematics in large-scale\n  structure or star-galaxy separation.\nOff theme: papers that only apply standard systematics corrections; cosmology results\nwhose main topic is not the systematics themselves.\nRelevance: 3 = the main subject is detecting or characterising streams or tidal\nfeatures in photometric surveys, or a quantified survey systematic (or a method against\nit) with direct consequences for such measurements; 2 = survey methods or data products\nuseful to stream work, or new stream detections with other data; 1 = related context.\nPrefer Milky Way work at equal fit.\n",
+   "keywords": {
+    "any": [
+     "stellar stream*",
+     "tidal stream*",
+     "tidal tail*",
+     "tidal feature*",
+     "stellar halo*",
+     "low surface brightness",
+     "matched filter*",
+     "star-galaxy",
+     "star/galaxy",
+     "star galaxy separation",
+     "star galaxy classification",
+     "selection function*",
+     "imaging systematic*",
+     "observational systematic*",
+     "survey systematic*",
+     "photometric systematic*",
+     "survey property map*",
+     "depth variation*",
+     "survey depth",
+     "galactic extinction",
+     "dust map*",
+     "blending",
+     "photometric calibration"
+    ],
+    "exclude": [
+     "tidal disruption event*",
+     "cold gas stream*"
+    ]
+   },
+   "name": "stream-observations",
+   "summary_guidance": "The reader is a stream dynamicist, not a specialist of stellar chemistry. When chemical\nabundances or chemodynamics are central to a paper, explain them simply: what the\nabundance or ratio traces (age, origin, star formation history of the progenitor) and\nwhy it matters for the stream. Standard notation such as [Fe/H] can stay.\n",
+   "title": "Observing streams and survey systematics"
+  },
+  "streams-dark-matter": {
+   "databases": {
+    "arxiv": [
+     "astro-ph.GA",
+     "astro-ph.CO"
+    ]
+   },
+   "description": "Using stellar streams to constrain dark matter (subhalo impacts, gaps, spurs, density and velocity fluctuations, dark matter models), and the stream dynamics that can mimic or hide those signatures.",
+   "examples": [
+    "arXiv:2609.10897",
+    "arXiv:2510.02247",
+    "arXiv:2605.16200"
+   ],
+   "guidance": "On theme:\n- Dark matter constraints or forecasts from streams: gaps, spurs, density power\n  spectra, velocity dispersion, subhalo impacts, dark matter models (WDM, FDM, SIDM, PBH).\n- Stream dynamics that are astrophysical systematics for dark matter studies: the host\n  potential (disk, bar, spiral arms, LMC, halo shape, time evolution), giant molecular\n  clouds, progenitor properties, epicyclic overdensities, chaos, stream-modelling methods.\n- Milky Way streams first; streams around external galaxies are on theme too.\nOff theme: detection or survey papers with no dark matter or dynamics analysis (they\nbelong to the next theme); cold gas flows, tidal disruption events, solar wind.\nRelevance: 3 = a dark matter constraint or forecast from streams, or a perturbation\nsystematic quantified for such studies; 2 = stream dynamics or modelling useful to\ndark matter inference; 1 = streams are context only. Prefer Milky Way work at equal fit.\n",
+   "keywords": {
+    "any": [
+     "stellar stream*",
+     "tidal stream*",
+     "tidal tail*",
+     "stream gap*",
+     "stream spur*",
+     "stream perturbation*",
+     "cold stream*",
+     "GD-1",
+     "Pal 5",
+     "Palomar 5",
+     "ATLAS-Aliqa Uma",
+     "Jhelum",
+     "Phoenix stream",
+     "Orphan stream",
+     "Sagittarius stream",
+     "tidal debris",
+     "tidal feature*"
+    ],
+    "exclude": [
+     "tidal disruption event*",
+     "cold gas stream*",
+     "cold flow*",
+     "solar wind"
+    ]
+   },
+   "name": "streams-dark-matter",
+   "summary_guidance": "The reader is a stream dynamicist, not a specialist of stellar chemistry. When chemical\nabundances or chemodynamics are central to a paper, explain them simply: what the\nabundance or ratio traces (age, origin, star formation history of the progenitor) and\nwhy it matters for the stream. Standard notation such as [Fe/H] can stay.\n",
+   "title": "Stellar streams as dark matter probes"
+  }
+ },
+ "updated": "2026-11-14T11:36:18+00:00"
+}
